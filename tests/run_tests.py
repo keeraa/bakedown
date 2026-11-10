@@ -353,6 +353,79 @@ def api_accepts_objects_linked_from_code():
 
 
 @test
+def metallic_albedo_is_not_darkened():
+    import numpy as np
+    fresh()
+    o = sphere("Metal", 4)
+    m = bpy.data.materials.new("Gold"); m.use_nodes = True
+    p = m.node_tree.nodes["Principled BSDF"]
+    p.inputs["Base Color"].default_value = (0.8, 0.5, 0.2, 1.0)
+    p.inputs["Metallic"].default_value = 1.0
+    o.data.materials.append(m)
+    bd.simplify(o, triangles=400)
+    bd.bake(o, resolution=1024, normal_map=False)
+    im = bpy.data.images[o["bakedown_image_BaseColor"]]
+    px = np.empty(len(im.pixels), np.float32); im.pixels.foreach_get(px)
+    px = px.reshape(-1, 4)
+    filled = px[(px[:, :3].sum(1) > 0.05)]
+    mean = filled[:, :3].mean(0)
+    srgb = lambda c: 1.055 * c ** (1 / 2.4) - 0.055 if c > 0.0031308 else 12.92 * c
+    expected = [srgb(c) for c in (0.8, 0.5, 0.2)]                   # 8-bit sRGB colour map
+    assert np.allclose(mean, expected, atol=0.03), (mean, expected)  # Diffuse pass gave ~0
+
+
+@test
+def faceted_original_gets_faceted_shading():
+    fresh()
+    bpy.ops.mesh.primitive_ico_sphere_add(subdivisions=1)
+    o = C.active_object
+    bpy.ops.object.mode_set(mode='EDIT'); bpy.ops.mesh.select_all(action='SELECT')
+    bpy.ops.mesh.subdivide(number_cuts=6)                 # planar facets, many triangles
+    bpy.ops.object.mode_set(mode='OBJECT'); bpy.ops.object.shade_smooth()
+    bd.simplify(o, triangles=80)
+    assert o["bakedown_shading"]["mode"] in ('FLAT', 'ANGLE'), dict(o["bakedown_shading"])
+    fresh()
+    s = sphere("Round", 6)
+    bpy.ops.object.shade_smooth()
+    bd.simplify(s, triangles=2000)
+    assert s["bakedown_shading"]["mode"] != 'FLAT', dict(s["bakedown_shading"])
+
+
+@test
+def triangle_budget_is_used():
+    fresh()
+    for target in (500, 2000):
+        o = sphere(f"T{target}", 6)
+        r = bd.simplify(o, triangles=target)
+        assert target * 0.97 <= r["triangles"] <= target, (target, r["triangles"])
+
+
+@test
+def api_normal_strength_sticks():
+    fresh()
+    o = sphere("N", 4)
+    bd.simplify(o, triangles=500)
+    bd.bake(o, resolution=1024, normal_strength=0.7)
+    mat = bpy.data.materials[o["bakedown_material_name"]]
+    node = next(n for n in mat.node_tree.nodes if n.type == 'NORMAL_MAP')
+    assert abs(node.inputs['Strength'].default_value - 0.7) < 1e-6
+    assert C.scene.bakedown.bake_normal_strength == 1.0      # scene setting restored, default 1.0
+
+
+@test
+def normal_map_repair_flattens_misses():
+    import numpy as np
+    im = bpy.data.images.new("NR", 4, 1)
+    px = np.array([0.5, 0.5, 1.0, 1,  0.9, 0.5, 0.2, 1,  0.5, 0.9, 0.55, 1,  0.6, 0.5, 0.9, 1], np.float32)
+    im.pixels.foreach_set(px)
+    share = bd._repair_normal_map(im)
+    out = np.empty(16, np.float32); im.pixels.foreach_get(out)
+    assert share == 0.5, share
+    assert np.allclose(out[4:7], (0.5, 0.5, 1.0), atol=0.01)       # sideways normal flattened
+    assert np.allclose(out[12:15], (0.6, 0.5, 0.9), atol=0.01)     # valid normal kept
+
+
+@test
 def api_errors_are_readable():
     fresh()
     o = sphere("E", 2)

@@ -13,9 +13,9 @@
 [![UI: EN · RU · ES · DE · ZH](https://img.shields.io/badge/UI-EN%20·%20RU%20·%20ES%20·%20DE%20·%20ZH-555)](#sprachen-der-oberfläche)
 [![AI agents ready](https://img.shields.io/badge/AI%20agents-ready-8A2BE2)](AGENTS.md)
 
-<img src="docs/images/bakedown_hero.gif" width="640" alt="Original mit 49.988 Dreiecken und BakeDown mit 2.734 Dreiecken: gleiches Aussehen, 95 % weniger Dreiecke">
+<img src="docs/images/bakedown_hero.gif" width="640" alt="Original mit 49.988 Dreiecken und BakeDown mit 3.000 Dreiecken: gleiches Aussehen, 94 % weniger Dreiecke">
 
-**−95 % Dreiecke · gleiches Aussehen · PBR-Texturen in Sekunden gebacken**
+**−94 % Dreiecke · gleiches Aussehen · PBR-Texturen in Sekunden gebacken**
 
 [**⬇ Download**](https://github.com/keeraa/bakedown/releases/latest) · [▶ 40-Sekunden-Demo](docs/media/bakedown_demo.mp4) · [🤖 Für KI-Agenten](AGENTS.md) · [❓ FAQ](docs/FAQ.md)
 
@@ -45,7 +45,9 @@ Charaktere: **Vereinfachen → Backen → Rig → LOD → Exportieren** (LODs na
 | Engine-Export | Achsen, Skalierung, Glättung, Normal-Map-Format merken | ✅ Presets für Unity / Unreal / glTF |
 | Automatisierung | `bpy`-Skripte schreiben und debuggen | ✅ Python-API und Kommandozeile mit JSON-Bericht |
 
-Ein Charakter mit 50.000 Dreiecken wird in **etwa 5 Sekunden** zu 2.700 Dreiecken mit 2K-PBR-Bake, vier LODs und einem Unity-FBX.
+Ein Charakter mit 50.000 Dreiecken wird in **etwa 5 Sekunden** zu 3.000 Dreiecken mit 2K-PBR-Bake, vier LODs und einem Unity-FBX.
+
+Qualität wird gemessen, nicht geschätzt: [`tools/quality_eval.py`](tools/quality_eval.py) rendert Original und Ergebnis von vier Seiten und vergleicht Form, Farbe und Silhouette. Version 1.5 senkte den Fehler im vollständigen Render um das 3- bis 4-Fache bei einem stilisierten Charakter und um das 10- bis 40-Fache bei einer metallischen Skulptur – Details in [docs/VERIFICATION.md](docs/VERIFICATION.md).
 
 ## Sieh selbst
 
@@ -54,7 +56,7 @@ Ein Charakter mit 50.000 Dreiecken wird in **etwa 5 Sekunden** zu 2.700 Dreiecke
 | ![Ganze Figur, texturiert](docs/images/compare_full_textured.jpg) | ![Ganze Figur, Drahtgitter](docs/images/compare_full_wireframe.jpg) |
 | ![Nahaufnahme, texturiert](docs/images/compare_closeup_textured.jpg) | ![Nahaufnahme, Drahtgitter](docs/images/compare_closeup_wireframe.jpg) |
 
-Original (links) und BakeDown (rechts): 49.988 → 2.734 Dreiecke, ca. 7,3 mm Verzerrung (0,56 %), 4K-Baking.
+Original (links) und BakeDown (rechts): 49.988 → 3.000 Dreiecke, ca. 1,8 mm Verzerrung (0,14 %), 4K-Baking.
 
 ## Was drin ist
 

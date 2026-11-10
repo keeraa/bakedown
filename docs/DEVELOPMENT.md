@@ -7,7 +7,7 @@ Read this before changing the add-on. Section 3 lists hard-won pitfalls.
 
 ---
 
-## 0. Architecture changes in 1.2–1.4
+## 0. Architecture changes in 1.2–1.5
 
 - All geometry processing is bound to `context.active_object`; `_activate_only()` deselects every other object before `bpy.ops` calls.
 - Geometry statistics go through `_triangle_count_mesh()` / `_triangle_count_object()` and count `mesh.loop_triangles`, not `mesh.polygons`.
@@ -23,6 +23,7 @@ Read this before changing the add-on. Section 3 lists hard-won pitfalls.
 - **1.3.0:** `_tr()` translates in the `BakeDown` context (`_I18N_CTX`); every translation is registered in both the default and the BakeDown context.
 - **1.4.0:** the bake operator is split into `_prepare()` + `invoke()` (modal, interactive) + `execute()` (blocking, for scripts / background mode).
 - **1.4.0:** public Python API at the end of the module (`process`, `simplify`, `bake`, `generate_lods`, `export`, `report`, `BakeDownError`, `API_VERSION`). It drives the operators with `EXEC_DEFAULT` and restores `scene.bakedown` through `_SceneSettings`. `tools/bakedown_cli.py` wraps it for files on disk. Keep `AGENTS.md` in sync when the API changes, and bump `API_VERSION` on breaking changes.
+- **1.5.0:** quality work driven by `tools/quality_eval.py` (see `docs/VERIFICATION.md`). Base Color is baked through `_bake_emit_socket(…, 'Base Color')` (emission reroute, like Metallic) when every high-poly material is Principled; otherwise the Diffuse Color pass is the fallback. `_choose_shading()` fits the low mesh's shading to the original's interpolated shading normals (`_normal_fit_samples` / `_normal_fit_error`, candidates `_SHADING_CANDIDATES`, tolerance `_SHADING_TOLERANCE`) and stores the result in `bakedown_shading` for LODs. `_run_to_target()` re-runs the pipeline to land within 3 % below the triangle target. `_repair_normal_map()` flattens tangent normals with z < `_NORMAL_MIN_Z`. Tunables that were measured and left off: `_AUTO_SYMMETRY`, `_UV_AVERAGE_SCALE`, `_UV_PACK`, `_UV_MARGIN_PX`.
 - UI source strings are English; translations are registered with `bpy.app.translations` (see section 6).
 
 ## 1. Architecture
@@ -129,7 +130,17 @@ Rig: `rig_template` (PointerProperty to an Object).
 
 ---
 
-## 5. Testing
+## 5. Measuring quality
+
+Before changing anything in Simplify or Bake, measure it:
+
+```bash
+blender -b --factory-startup --python tools/quality_eval.py -- model.glb --triangles 3000 --json before.json
+```
+
+Compare `surface_mean_pct` and the `pixel_error` of `shape`, `albedo`, `full`, `closeup_full` (lower is better) on at least one faceted / stylised model and one smooth organic model, at 1k, 3k and 10k triangles. `--addon path/to/variant.py` evaluates a modified copy of the add-on. Keep a change only if it helps.
+
+## 6. Testing
 
 Automated tests run headless in real Blender:
 
@@ -141,7 +152,7 @@ They cover the Python API and the command-line tool, registration, active-object
 
 ---
 
-## 6. Translations
+## 7. Translations
 
 English is the source language. `_TRANSLATIONS` maps a Blender locale to `{("*", english): translated}`:
 
@@ -156,7 +167,7 @@ Strings drawn through `_tr()` use the `BakeDown` context, so BakeDown's own word
 
 ---
 
-## 7. Ideas for later
+## 8. Ideas for later
 - Triangle presets by viewing distance (hero / background) — partially covered by LODs.
 - Saved export presets (folder / engine / Y-flip) per project.
 - Texture atlas for a batch of objects (fewer draw calls).

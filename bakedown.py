@@ -3,7 +3,7 @@
 bl_info = {
     "name": "BakeDown — Game Asset Optimizer",
     "author": "Kirill Migachev",
-    "version": (1, 4, 1),
+    "version": (1, 5, 0),
     "blender": (4, 5, 0),
     "location": "View3D > Sidebar > BakeDown",
     "description": ("Turn heavy meshes — AI-generated, scanned, sculpted or downloaded — into "
@@ -1164,7 +1164,12 @@ def _measure_distortion(context, o):
 # ---------------------------------------------------------------------------
 # Settings
 # ---------------------------------------------------------------------------
+_api_restoring = False
+
+
 def _update_normal_strength(self, context):
+    if _api_restoring:          # the API restoring scene settings must not touch materials
+        return
     o = _base_object(context.active_object)
     if not o:
         return
@@ -1376,7 +1381,7 @@ class BakeDownSettings(bpy.types.PropertyGroup):
         name="Merge near-planar faces before collapse", default=True,
         description="Merge near-planar faces before the collapse decimation pass")
     final_dissolve: bpy.props.BoolProperty(
-        name="Final Limited Dissolve", default=True,
+        name="Final Limited Dissolve", default=False,
         description="Run one more planar cleanup pass after collapse")
     fill_holes: bpy.props.BoolProperty(
         name="Fill holes", default=False,
@@ -1400,7 +1405,7 @@ class BakeDownSettings(bpy.types.PropertyGroup):
         name="Bake a normal map", default=True,
         description="Restore high-poly surface detail with a tangent-space normal map")
     bake_normal_strength: bpy.props.FloatProperty(
-        name="Normal strength", default=0.5, min=0.0, max=2.0,
+        name="Normal strength", default=1.0, min=0.0, max=2.0,
         update=_update_normal_strength,
         description="Live normal-map strength; changing it does not require another bake")
     bake_extrusion: bpy.props.FloatProperty(
@@ -1478,6 +1483,35 @@ def _evaluated_mesh_with_only_modifier(context, obj, modifier):
         context.view_layer.update()
 
 
+_AUTO_SYMMETRY = False  # measured: no fidelity gain (tools/quality_eval.py); kept as a switch
+
+
+def _symmetry_axis(mesh, tolerance=0.002):
+    """Local axis ('X', 'Y' or 'Z') across which the mesh is mirror-symmetric about its
+    bounding-box centre, or None. 97 % of sampled vertices must have a mirrored partner
+    on the surface within `tolerance` × object size."""
+    import numpy as np
+    from mathutils import Matrix, Vector
+    n = len(mesh.vertices)
+    if n < 8:
+        return None
+    co = np.empty(n * 3); mesh.vertices.foreach_get("co", co); co = co.reshape(-1, 3)
+    lo, hi = co.min(0), co.max(0)
+    center, size = (lo + hi) / 2, float(np.linalg.norm(hi - lo)) or 1.0
+    sample = co[np.linspace(0, n - 1, min(n, 3000)).astype(np.int64)]
+    tree = _mesh_bvh_world(mesh, Matrix.Identity(4))
+    best = None
+    for axis, i in (('X', 0), ('Y', 1), ('Z', 2)):
+        m = sample.copy()
+        m[:, i] = 2 * center[i] - m[:, i]
+        dist = [tree.find_nearest(Vector(p))[3] for p in m]
+        d = np.array([size if x is None else x for x in dist]) / size
+        share = float((d < tolerance).mean())
+        if share >= 0.97 and (best is None or share > best[1]):
+            best = (axis, share)
+    return best[0] if best else None
+
+
 def _run_pipeline(context, o, target, pg):
     """One simplification FROM THE BACKUP down to `target` triangles + distortion measurement."""
     _ensure_backup(o)
@@ -1512,6 +1546,11 @@ def _run_pipeline(context, o, target, pg):
         mod = o.modifiers.new("BakeDownCollapse", 'DECIMATE')
         mod.decimate_type = 'COLLAPSE'
         mod.ratio = ratio
+        if _AUTO_SYMMETRY:
+            axis = _symmetry_axis(o.data)
+            if axis is not None:
+                mod.use_symmetry = True
+                mod.symmetry_axis = axis
         new_me = _evaluated_mesh_with_only_modifier(context, o, mod)
         old = o.data
         o.data = new_me
@@ -1534,6 +1573,25 @@ def _run_pipeline(context, o, target, pg):
     if pg.planar_snap:
         _planar_snap(o)
     _measure_distortion(context, o)
+
+
+def _run_to_target(context, o, target, pg, tries=4):
+    """Run the pipeline so the result uses the triangle budget: cleanup and the final
+    dissolve remove extra triangles, so a plain ratio lands well below the target.
+    Re-runs from the backup with a corrected request and keeps the best result that
+    does not exceed the target."""
+    request = target
+    best = None
+    for _ in range(tries):
+        _run_pipeline(context, o, request, pg)
+        got = _triangle_count_object(o)
+        if got <= target and (best is None or got > best[0]):
+            best = (got, request)
+        if target * 0.97 <= got <= target or got == 0:
+            break
+        request = max(4, int(request * target / got))
+    if best is not None and best[0] != _triangle_count_object(o):
+        _run_pipeline(context, o, best[1], pg)
 
 
 def _auto_target(context, o, pg):
@@ -1560,7 +1618,183 @@ def _auto_target(context, o, pg):
     _run_pipeline(context, o, best, pg)
 
 
+def _shading_style(mesh):
+    """How the original is shaded: ('FLAT', 0), ('SMOOTH', pi) or ('ANGLE', radians).
+
+    Edges are matched by vertex *position* (welded), because many exporters (glTF, FBX)
+    store hard edges as separate vertices. For every welded edge shared by two faces we
+    compare the corner normals the two faces use at the same point: different normals
+    mean a hard edge."""
+    import numpy as np
+    n_poly, n_loop, n_vert = len(mesh.polygons), len(mesh.loops), len(mesh.vertices)
+    if not n_poly:
+        return ('SMOOTH', math.pi)
+    try:
+        cn = np.empty(n_loop * 3, dtype=np.float32)
+        mesh.corner_normals.foreach_get("vector", cn)
+    except Exception:
+        return ('SMOOTH', math.pi)
+    cn = cn.reshape(-1, 3)
+    co = np.empty(n_vert * 3, dtype=np.float64); mesh.vertices.foreach_get("co", co)
+    co = co.reshape(-1, 3)
+    size = float(np.ptp(co, axis=0).max()) or 1.0
+    _u, weld = np.unique(np.round(co / (size * 1e-5)).astype(np.int64), axis=0, return_inverse=True)
+    weld = weld.reshape(-1)
+    starts = np.empty(n_poly, dtype=np.int64); mesh.polygons.foreach_get("loop_start", starts)
+    totals = np.empty(n_poly, dtype=np.int64); mesh.polygons.foreach_get("loop_total", totals)
+    pn = np.empty(n_poly * 3, dtype=np.float32); mesh.polygons.foreach_get("normal", pn)
+    pn = pn.reshape(-1, 3)
+    lv = np.empty(n_loop, dtype=np.int64); mesh.loops.foreach_get("vertex_index", lv)
+    wv = weld[lv]
+    loop_poly = np.repeat(np.arange(n_poly), totals)
+    nxt = np.arange(n_loop) + 1
+    nxt[starts + totals - 1] = starts
+    a, b = wv, wv[nxt]
+    keys = np.minimum(a, b) * (int(weld.max()) + 1) + np.maximum(a, b)
+    order = np.argsort(keys, kind="stable")
+    ks = keys[order]
+    first = np.nonzero(np.r_[True, ks[1:] != ks[:-1]])[0]
+    counts = np.diff(np.r_[first, len(ks)])
+    la = order[first[counts == 2]]
+    lb = order[first[counts == 2] + 1]
+    if not len(la):
+        return ('SMOOTH', math.pi)
+    # corner of face B at the same welded point as la (and as nxt[la])
+    b_at_a = np.where(wv[lb] == wv[la], lb, nxt[lb])
+    b_at_n = np.where(wv[lb] == wv[nxt[la]], lb, nxt[lb])
+    split = (np.einsum("ij,ij->i", cn[la], cn[b_at_a]) < 0.9999) | \
+            (np.einsum("ij,ij->i", cn[nxt[la]], cn[b_at_n]) < 0.9999)
+    dihedral = np.degrees(np.arccos(np.clip(
+        np.einsum("ij,ij->i", pn[loop_poly[la]], pn[loop_poly[lb]]), -1.0, 1.0)))
+    curved = dihedral > 0.5                      # coplanar edges say nothing about style
+    if not curved.any():
+        return ('SMOOTH', math.pi)
+    share = float(split[curved].mean())
+    if share > 0.97:
+        return ('FLAT', 0.0)
+    if share < 0.02:
+        return ('SMOOTH', math.pi)
+    # the angle above which the original splits normals
+    return ('ANGLE', math.radians(float(np.percentile(dihedral[curved & split], 10))))
+
+
+def _apply_shading(context, obj, style):
+    """Give a simplified mesh the original's shading style (flat / smooth / by angle)."""
+    mode, angle = style
+    _activate_only(context, obj)
+    try:
+        if mode == 'FLAT':
+            bpy.ops.object.shade_flat()
+        elif mode == 'SMOOTH':
+            bpy.ops.object.shade_smooth(keep_sharp_edges=False)
+        elif mode == 'SMOOTH_KEEP':
+            # smooth, but keep the sharp edges carried over from the original
+            bpy.ops.object.shade_smooth(keep_sharp_edges=True)
+        else:
+            bpy.ops.object.shade_smooth_by_angle(angle=max(math.radians(1.0), angle),
+                                                 keep_sharp_edges=False)
+    except Exception as exc:
+        print(f"BakeDown shading transfer failed: {exc}")
+
+
+def _normal_fit_samples(lo_mesh, hi_mesh, max_tris=20000):
+    """Sample points inside the low-poly triangles and the original's surface normal
+    nearest to each. Positions do not depend on shading, so this is computed once."""
+    import numpy as np
+    from mathutils import Matrix, Vector
+    lo_mesh.calc_loop_triangles()
+    n = len(lo_mesh.loop_triangles)
+    if not n:
+        return None
+    loops = np.empty(n * 3, dtype=np.int64); lo_mesh.loop_triangles.foreach_get("loops", loops)
+    verts = np.empty(n * 3, dtype=np.int64); lo_mesh.loop_triangles.foreach_get("vertices", verts)
+    area = np.empty(n, dtype=np.float64); lo_mesh.loop_triangles.foreach_get("area", area)
+    co = np.empty(len(lo_mesh.vertices) * 3); lo_mesh.vertices.foreach_get("co", co)
+    co = co.reshape(-1, 3)
+    pick = np.arange(n) if n <= max_tris else np.linspace(0, n - 1, max_tris).astype(np.int64)
+    loops = loops.reshape(-1, 3)[pick]
+    tri = co[verts.reshape(-1, 3)[pick]]                         # (t, 3, 3)
+    weights = np.array([[4, 1, 1], [1, 4, 1], [1, 1, 4]], dtype=np.float64) / 6.0
+    pts = np.einsum("wk,tkc->twc", weights, tri).reshape(-1, 3)  # 3 points per triangle
+    # Compare with what the viewer sees on the original: its interpolated *shading*
+    # normals (custom / split normals included), not the raw face normals.
+    from mathutils.bvhtree import BVHTree
+    from mathutils.interpolate import poly_3d_calc
+    hi_mesh.calc_loop_triangles()
+    hn = len(hi_mesh.loop_triangles)
+    h_loops = np.empty(hn * 3, dtype=np.int64); hi_mesh.loop_triangles.foreach_get("loops", h_loops)
+    h_verts = np.empty(hn * 3, dtype=np.int64); hi_mesh.loop_triangles.foreach_get("vertices", h_verts)
+    h_loops, h_verts = h_loops.reshape(-1, 3), h_verts.reshape(-1, 3)
+    h_co = np.empty(len(hi_mesh.vertices) * 3); hi_mesh.vertices.foreach_get("co", h_co)
+    h_co = h_co.reshape(-1, 3)
+    h_cn = np.empty(len(hi_mesh.loops) * 3); hi_mesh.corner_normals.foreach_get("vector", h_cn)
+    h_cn = h_cn.reshape(-1, 3)
+    tree = BVHTree.FromPolygons(h_co.tolist(), h_verts.tolist(), all_triangles=True)
+    hi_n = np.zeros_like(pts)
+    for i, p in enumerate(pts):
+        loc, _nor, idx, _d = tree.find_nearest(Vector(p))
+        if loc is None:
+            continue
+        corners = [Vector(c) for c in h_co[h_verts[idx]]]
+        w = poly_3d_calc(corners, loc)
+        n = (h_cn[h_loops[idx]] * np.array(w)[:, None]).sum(axis=0)
+        hi_n[i] = n / (np.linalg.norm(n) + 1e-12)
+    return {"loops": loops, "weights": weights, "hi_n": hi_n,
+            "w": np.repeat(area[pick], 3)}
+
+
+def _normal_fit_error(lo_mesh, samples):
+    """Area-weighted mean angle (degrees) between the low mesh's shading normals and the
+    original surface normals at the sample points."""
+    import numpy as np
+    cn = np.empty(len(lo_mesh.loops) * 3, dtype=np.float64)
+    lo_mesh.corner_normals.foreach_get("vector", cn)
+    cn = cn.reshape(-1, 3)[samples["loops"]]                     # (t, 3, 3)
+    sn = np.einsum("wk,tkc->twc", samples["weights"], cn).reshape(-1, 3)
+    sn /= np.linalg.norm(sn, axis=1, keepdims=True) + 1e-12
+    dots = np.clip(np.einsum("ij,ij->i", sn, samples["hi_n"]), -1.0, 1.0)
+    ang = np.degrees(np.arccos(dots))
+    return float((ang * samples["w"]).sum() / max(samples["w"].sum(), 1e-12))
+
+
+# From smoothest to hardest. A smoother option wins when it is within 3 % of the best fit:
+# hard edges cost vertex splits and show facets at a distance once normal maps blur.
+_SHADING_CANDIDATES = (('SMOOTH', math.pi), ('SMOOTH_KEEP', math.pi), ('ANGLE', math.radians(60)),
+                       ('ANGLE', math.radians(45)), ('ANGLE', math.radians(30)),
+                       ('ANGLE', math.radians(20)), ('FLAT', 0.0))
+_SHADING_TOLERANCE = 1.03
+
+
+def _choose_shading(context, o):
+    """Pick the shading (smooth / smooth by angle / flat) whose normals best match the
+    original surface, apply it and remember it for LODs."""
+    bk = _get_backup(o)
+    if bk is None:
+        return None
+    try:
+        samples = _normal_fit_samples(o.data, bk)
+    except Exception as exc:
+        print(f"BakeDown shading fit skipped: {exc}")
+        return None
+    if samples is None:
+        return None
+    candidates = list(_SHADING_CANDIDATES)
+    original = _shading_style(bk)
+    if original not in candidates:
+        candidates.insert(-1, original)
+    scored = []
+    for style in candidates:
+        _apply_shading(context, o, style)
+        scored.append((_normal_fit_error(o.data, samples), style))
+    best_err = min(err for err, _style in scored)
+    err, style = next((e, st) for e, st in scored if e <= best_err * _SHADING_TOLERANCE)
+    _apply_shading(context, o, style)
+    o["bakedown_shading"] = {"mode": style[0], "angle": style[1], "fit_deg": err}
+    return style
+
+
 def _finish_simplify(context, o):
+    _choose_shading(context, o)
     o["bakedown_simplified"] = True
     o["bakedown_geo_version"] = o.get("bakedown_geo_version", 0) + 1
 
@@ -1598,7 +1832,7 @@ class OBJECT_OT_bakedown_decimate(bpy.types.Operator):
             if pg.target_mode == 'DISTORTION':
                 _auto_target(context, o, pg)
             else:
-                _run_pipeline(context, o, pg.target_faces, pg)
+                _run_to_target(context, o, pg.target_faces, pg)
             _finish_simplify(context, o)
             _enter_inspect(context)
             success = True
@@ -1730,23 +1964,84 @@ class OBJECT_OT_bakedown_finalize(bpy.types.Operator):
 # ---------------------------------------------------------------------------
 # Texture baking (modal bake with a progress bar)
 # ---------------------------------------------------------------------------
-def _metallic_emit_copy(orig):
-    """Material copy with Metallic routed into Emission (for the EMIT metallic bake)."""
+def _principled(mat):
+    if mat is None or not mat.use_nodes or mat.node_tree is None:
+        return None
+    return next((n for n in mat.node_tree.nodes if n.type == 'BSDF_PRINCIPLED'), None)
+
+
+def _emit_copy(orig, socket_name):
+    """Material copy with one Principled input routed into Emission, for an EMIT bake
+    that reads the input exactly (no lighting, no metallic darkening)."""
     mc = orig.copy()
     nt = mc.node_tree
-    p = next((n for n in nt.nodes if n.type == 'BSDF_PRINCIPLED'), None)
-    out = next((n for n in nt.nodes if n.type == 'OUTPUT_MATERIAL'), None)
+    p = _principled(mc)
+    out = next((n for n in nt.nodes if n.type == 'OUTPUT_MATERIAL' and n.is_active_output), None) \
+        or next((n for n in nt.nodes if n.type == 'OUTPUT_MATERIAL'), None)
     if p is None or out is None:
         return mc
     em = nt.nodes.new("ShaderNodeEmission")
-    minp = p.inputs['Metallic']
-    if minp.is_linked:
-        nt.links.new(minp.links[0].from_socket, em.inputs['Color'])
+    em.inputs['Strength'].default_value = 1.0
+    src = p.inputs[socket_name]
+    if src.is_linked:
+        nt.links.new(src.links[0].from_socket, em.inputs['Color'])
     else:
-        c = minp.default_value
-        em.inputs['Color'].default_value = (c, c, c, 1)
+        c = src.default_value
+        em.inputs['Color'].default_value = tuple(c) if hasattr(c, "__len__") else (c, c, c, 1)
     nt.links.new(em.outputs['Emission'], out.inputs['Surface'])
     return mc
+
+
+def _metallic_emit_copy(orig):
+    """Material copy with Metallic routed into Emission (for the EMIT metallic bake)."""
+    return _emit_copy(orig, 'Metallic')
+
+
+# UV layout for the bake (tuned with tools/quality_eval.py)
+_UV_ANGLE = 66.0
+_UV_AVERAGE_SCALE = False
+_UV_PACK = dict(rotate=True)
+_UV_MARGIN_PX = None          # None → fixed 0.003 margin
+
+
+def _unwrap_for_bake(res):
+    """Smart UV project + pack, in Edit Mode with everything selected."""
+    margin = 0.003 if _UV_MARGIN_PX is None else _UV_MARGIN_PX / float(res)
+    bpy.ops.uv.smart_project(angle_limit=math.radians(_UV_ANGLE),
+                             island_margin=margin, correct_aspect=True)
+    bpy.ops.uv.select_all(action='SELECT')
+    if _UV_AVERAGE_SCALE:
+        bpy.ops.uv.average_islands_scale()
+    kwargs = dict(_UV_PACK)
+    if _UV_MARGIN_PX is not None:
+        kwargs.setdefault("margin_method", 'FRACTION')
+    bpy.ops.uv.pack_islands(margin=margin, **kwargs)
+
+
+_NORMAL_MIN_Z = 0.25    # tangent normals flatter than this are ray misses (tuned with quality_eval)
+
+
+def _repair_normal_map(im, min_z=None):
+    """Replace texels whose tangent-space normal points sideways or backwards with a flat
+    normal. Those come from bake rays that hit a neighbouring layer (a belt over a shirt,
+    an inner surface) and would light the surface from behind."""
+    min_z = _NORMAL_MIN_Z if min_z is None else min_z
+    if im is None or min_z is None or min_z <= -1.0:
+        return 0.0
+    try:
+        import numpy as np
+        w, h = im.size
+        px = np.empty(w * h * 4, dtype=np.float32)
+        im.pixels.foreach_get(px)
+        px = px.reshape(-1, 4)
+        bad = (px[:, 2] * 2.0 - 1.0) < min_z
+        if bad.any():
+            px[bad, 0:3] = (0.5, 0.5, 1.0)
+            im.pixels.foreach_set(px.reshape(-1))
+            im.update()
+        return float(bad.mean())
+    except Exception:
+        return 0.0
 
 
 def _sharpen_image(im, amount):
@@ -1880,9 +2175,7 @@ class OBJECT_OT_bakedown_bake(bpy.types.Operator):
             _activate_only(context, lo)
             bpy.ops.object.mode_set(mode='EDIT')
             bpy.ops.mesh.select_all(action='SELECT')
-            bpy.ops.uv.smart_project(angle_limit=math.radians(66.0),
-                                     island_margin=0.003, correct_aspect=True)
-            bpy.ops.uv.pack_islands(margin=0.003, rotate=True)
+            _unwrap_for_bake(res)
             bpy.ops.object.mode_set(mode='OBJECT')
 
             token = uuid.uuid4().hex[:8]
@@ -2025,12 +2318,37 @@ class OBJECT_OT_bakedown_bake(bpy.types.Operator):
         if 'FINISHED' not in result:
             raise RuntimeError(f"Blender bake operator returned {result}")
 
+    def _bake_emit_socket(self, context, node, socket_name):
+        """Bake one Principled input through an emission reroute on material copies,
+        then put the original materials back for the following passes."""
+        saved = [(slot.link, slot.material) for slot in self.hi.material_slots]
+        try:
+            for slot in self.hi.material_slots:
+                if slot.material is None:
+                    continue
+                mc = _emit_copy(slot.material, socket_name)
+                self.copies.append(mc)
+                slot.link = 'OBJECT'
+                slot.material = mc
+            self._do_bake(context, node, 'EMIT')
+        finally:
+            for slot, (link, mat) in zip(self.hi.material_slots, saved):
+                slot.link = link
+                if link == 'OBJECT':
+                    slot.material = mat
+
     def _p_diffuse(self, context):
-        b = context.scene.render.bake
-        b.use_pass_direct = False
-        b.use_pass_indirect = False
-        b.use_pass_color = True
-        self._do_bake(context, self.n_base, 'DIFFUSE')
+        mats = [s.material for s in self.hi.material_slots]
+        if mats and all(_principled(m) is not None for m in mats):
+            # Exact albedo. The Diffuse Color pass multiplies by (1 - metallic) and
+            # darkens metallic surfaces.
+            self._bake_emit_socket(context, self.n_base, 'Base Color')
+        else:
+            b = context.scene.render.bake
+            b.use_pass_direct = False
+            b.use_pass_indirect = False
+            b.use_pass_color = True
+            self._do_bake(context, self.n_base, 'DIFFUSE')
         _sharpen_image(self.img_base, context.scene.bakedown.bake_sharpen)
 
     def _p_rough(self, context):
@@ -2038,16 +2356,10 @@ class OBJECT_OT_bakedown_bake(bpy.types.Operator):
 
     def _p_normal(self, context):
         self._do_bake(context, self.n_norm, 'NORMAL', normal_space='TANGENT')
+        self._normal_repaired = _repair_normal_map(self.img_norm)
 
     def _p_metal(self, context):
-        for slot in self.hi.material_slots:
-            if slot.material is None:
-                continue
-            mc = _metallic_emit_copy(slot.material)
-            self.copies.append(mc)
-            slot.link = 'OBJECT'
-            slot.material = mc
-        self._do_bake(context, self.n_met, 'EMIT')
+        self._bake_emit_socket(context, self.n_met, 'Metallic')
 
     def _p_pack(self, im):
         im.pack()
@@ -2620,6 +2932,10 @@ class OBJECT_OT_bakedown_lod(bpy.types.Operator):
                 lod.data = newme
                 if oldme.users == 0:
                     bpy.data.meshes.remove(oldme)
+            # keep the base object's shading style on every level
+            style = (o.get("bakedown_shading") or {})
+            if style.get("mode"):
+                _apply_shading(context, lod, (style["mode"], style["angle"]))
             # now attach the armature (after decimation)
             if arm is not None:
                 am = lod.modifiers.new("Armature", 'ARMATURE')
@@ -3145,8 +3461,9 @@ class _SceneSettings:
         return self.pg
 
     def __exit__(self, *exc):
-        global _lod_syncing
+        global _lod_syncing, _api_restoring
         _lod_syncing = True
+        _api_restoring = True
         try:
             for key, value in self.saved.items():
                 try:
@@ -3155,6 +3472,7 @@ class _SceneSettings:
                     pass
         finally:
             _lod_syncing = False
+            _api_restoring = False
         return False
 
 
@@ -3248,7 +3566,7 @@ def simplify(obj, triangles=None, distortion=None, **options):
     return report(obj)
 
 
-def bake(obj, resolution=2048, normal_map=True, normal_strength=0.5,
+def bake(obj, resolution=2048, normal_map=True, normal_strength=1.0,
          sharpen=0.0, ray_distance=0.0):
     """Bake Base Color, Roughness, Metallic (and Normal) from the original onto the
     simplified mesh. Blocking; uses Cycles on the CPU."""

@@ -1,11 +1,29 @@
 # Changelog
 
-## Unreleased
+## 1.5.0 — 2026-11-10
+
+Quality release. Every change was measured with the new `tools/quality_eval.py` (four-view renders of original vs result: shape, colour, full material, close-ups, silhouette, surface distance); changes that did not measurably help were not kept.
+
+### Improved
+
+- **Exact base colour.** Base Color is baked from the material input through an emission reroute instead of the Diffuse Color pass, which multiplies by (1 − metallic) and darkened metallic surfaces. Colour error on the test character 6.9 → 0.4 px; a metallic sculpt no longer bakes dark.
+- **Shading that matches the original.** After Simplify, BakeDown tries smooth, smooth-with-original-sharp-edges, smooth by 60/45/30/20° and flat shading and keeps the one whose normals best match the original's shading normals (a smoother option wins within 3 %). Stylised low-poly models stay faceted instead of turning "plasticine"; organic ones stay smooth. Shape error on the test character 13.5 → 3.0 px. LODs reuse the chosen shading.
+- **Full triangle budget.** Simplify re-runs from the backup with a corrected request until the result lands within 3 % below the target (3,000 instead of 2,734).
+- **Normal strength defaults to 1.0** (was 0.5, which removed half of the baked relief). Full-render error on the sculpt 3.5 → 1.0 px.
+- **Normal-map repair.** Texels whose tangent normal points sideways or backwards (rays that hit a neighbouring layer) are replaced with a flat normal.
+- **Final Limited Dissolve is off by default** — after the budget is reached it only removed detail (mean surface error −34 % on the test character).
+
+Overall full-render error vs 1.4.1: character 7.4 → 1.9 px at 3k triangles, sculpt 21.1 → 0.8 px.
+
+### Fixed
+
+- API: `bake(normal_strength=…)` was reset to the scene value when the API restored settings.
+- Symmetry detection treated an exact mirror match (distance 0) as a miss. Automatic symmetric decimation is available as an internal switch but stays off: it did not improve fidelity.
 
 ### Documentation
 
-- New README layout in all five languages: badges, 10-second hero GIF, quick start, "Why BakeDown" comparison, compact feature list.
-- `docs/FAQ.md` (targets, distortion, baking problems, rigs, Unity/Unreal), `CONTRIBUTING.md`, issue and pull-request templates, social preview image.
+- New README layout in all five languages: badges, 10-second hero GIF, quick start, "Why BakeDown" comparison, compact feature list; screenshots and GIF re-made with 1.5.0.
+- `docs/FAQ.md`, `CONTRIBUTING.md`, issue and pull-request templates, social preview image.
 - GitHub Actions run the test suite on Blender 4.5 and 5.1 (Linux).
 
 ## 1.4.1 — 2026-11-10

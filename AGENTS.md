@@ -44,7 +44,7 @@ report = bakedown.process(
 )
 ```
 
-Step by step: `bakedown.simplify(obj, triangles=… | distortion=…, **options)`, `bakedown.bake(obj, resolution=2048, normal_map=True, normal_strength=0.5, sharpen=0.0, ray_distance=0.0)`, `bakedown.generate_lods(obj, 50, 25, 10)`, `bakedown.export(obj, directory, engine="UNITY")`, `bakedown.report(obj)`.
+Step by step: `bakedown.simplify(obj, triangles=… | distortion=…, **options)`, `bakedown.bake(obj, resolution=2048, normal_map=True, normal_strength=1.0, sharpen=0.0, ray_distance=0.0)`, `bakedown.generate_lods(obj, 50, 25, 10)`, `bakedown.export(obj, directory, engine="UNITY")`, `bakedown.report(obj)`.
 
 Simplify options: `dissolve_angle`, `do_dissolve_faces`, `final_dissolve`, `fill_holes`, `remove_interior`, `planar_snap`, `triangulate_output`.
 
@@ -64,6 +64,8 @@ Every function processes **one** mesh object, never modifies other objects, retu
 | Distant background | 0.1–0.5k | 1024 |
 
 - Check `distortion_pct` after `simplify()`: **≤ 0.5 %** usually looks identical, **0.5–1 %** is fine for mid-distance, **> 1 %** — increase `triangles` or use `distortion=0.5`.
+- Leave `normal_strength` at 1.0 and `sharpen` at 0 unless the user asks otherwise — both are physically correct defaults.
+- Shading (flat / smooth / by angle) is chosen automatically to match the original; do not re-shade the result.
 - If baked textures show black spots, retry `bake()` with a larger `ray_distance` (local mesh units).
 - For a rigged character: simplify → bake → transfer the rig in the UI → `generate_lods()`; LODs inherit the armature.
 - Unity uses OpenGL normal maps (no flip); Unreal uses DirectX (`flip_normal_green=True` in `export()`); glTF never flips.

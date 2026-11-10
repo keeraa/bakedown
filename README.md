@@ -13,9 +13,9 @@
 [![UI: EN · RU · ES · DE · ZH](https://img.shields.io/badge/UI-EN%20·%20RU%20·%20ES%20·%20DE%20·%20ZH-555)](#interface-languages)
 [![AI agents ready](https://img.shields.io/badge/AI%20agents-ready-8A2BE2)](AGENTS.md)
 
-<img src="docs/images/bakedown_hero.gif" width="640" alt="Original 49,988 triangles vs BakeDown 2,734 triangles: same look, 95% fewer triangles">
+<img src="docs/images/bakedown_hero.gif" width="640" alt="Original 49,988 triangles vs BakeDown 3,000 triangles: same look, 94% fewer triangles">
 
-**−95% triangles · same look · PBR textures baked in seconds**
+**−94% triangles · same look · PBR textures baked in seconds**
 
 [**⬇ Download**](https://github.com/keeraa/bakedown/releases/latest) · [▶ 40-second demo](docs/media/bakedown_demo.mp4) · [🤖 For AI agents](AGENTS.md) · [❓ FAQ](docs/FAQ.md)
 
@@ -45,7 +45,9 @@ Characters: **Simplify → Bake → Rig → LOD → Export** (LODs made after th
 | Engine export | remember axis, scale, smoothing, normal-map rules | ✅ Unity / Unreal / glTF presets |
 | Automation | write and debug `bpy` scripts | ✅ Python API + CLI with a JSON report |
 
-A 50k-triangle character becomes 2.7k triangles with a 2K PBR bake, four LODs and a Unity FBX in **about 5 seconds**.
+A 50k-triangle character becomes 3k triangles with a 2K PBR bake, four LODs and a Unity FBX in **about 5 seconds**.
+
+Quality is measured, not eyeballed: [`tools/quality_eval.py`](tools/quality_eval.py) renders the original and the result from four sides and compares shape, colour and silhouette. Version 1.5 cut the full-render error 3–4× on a stylised character and 10–40× on a metallic sculpt — see [docs/VERIFICATION.md](docs/VERIFICATION.md).
 
 ## See the difference
 
@@ -54,7 +56,7 @@ A 50k-triangle character becomes 2.7k triangles with a 2K PBR bake, four LODs an
 | ![Full figure, textured](docs/images/compare_full_textured.jpg) | ![Full figure, wireframe](docs/images/compare_full_wireframe.jpg) |
 | ![Close-up, textured](docs/images/compare_closeup_textured.jpg) | ![Close-up, wireframe](docs/images/compare_closeup_wireframe.jpg) |
 
-Original (left) vs BakeDown (right): 49,988 → 2,734 triangles, approx. distortion 7.3 mm (0.56%), 4K bake.
+Original (left) vs BakeDown (right): 49,988 → 3,000 triangles, approx. distortion 1.8 mm (0.14%), 4K bake.
 
 ## What's inside
 

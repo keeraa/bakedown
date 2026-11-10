@@ -13,9 +13,9 @@
 [![UI: EN · RU · ES · DE · ZH](https://img.shields.io/badge/UI-EN%20·%20RU%20·%20ES%20·%20DE%20·%20ZH-555)](#界面语言)
 [![AI agents ready](https://img.shields.io/badge/AI%20agents-ready-8A2BE2)](AGENTS.md)
 
-<img src="docs/images/bakedown_hero.gif" width="640" alt="原始模型 49,988 个三角面，BakeDown 结果 2,734 个三角面：外观不变，三角面减少 95%">
+<img src="docs/images/bakedown_hero.gif" width="640" alt="原始模型 49,988 个三角面，BakeDown 结果 3,000 个三角面：外观不变，三角面减少 94%">
 
-**三角面减少 95% · 外观不变 · 数秒完成 PBR 纹理烘焙**
+**三角面减少 94% · 外观不变 · 数秒完成 PBR 纹理烘焙**
 
 [**⬇ 下载**](https://github.com/keeraa/bakedown/releases/latest) · [▶ 40 秒演示](docs/media/bakedown_demo.mp4) · [🤖 AI 智能体](AGENTS.md) · [❓ 常见问题](docs/FAQ.md)
 
@@ -45,7 +45,9 @@ BakeDown 是一款免费的 Blender 插件，可将**任何高面数网格**—�
 | 导出到引擎 | 记住坐标轴、缩放、平滑和法线格式 | ✅ Unity / Unreal / glTF 预设 |
 | 自动化 | 编写并调试 `bpy` 脚本 | ✅ Python API 和命令行工具，输出 JSON 报告 |
 
-一个 5 万面的角色，**约 5 秒**即可变为 2.7 千面，并完成 2K PBR 烘焙、四级 LOD 和 Unity FBX 导出。
+一个 5 万面的角色，**约 5 秒**即可变为 3 千面，并完成 2K PBR 烘焙、四级 LOD 和 Unity FBX 导出。
+
+质量靠测量而非目测：[`tools/quality_eval.py`](tools/quality_eval.py) 从四个方向渲染原始模型和结果，比较形状、颜色和轮廓。1.5 版将完整渲染误差在风格化角色上降低了 3–4 倍，在金属雕塑上降低了 10–40 倍——详见 [docs/VERIFICATION.md](docs/VERIFICATION.md)。
 
 ## 效果对比
 
@@ -54,7 +56,7 @@ BakeDown 是一款免费的 Blender 插件，可将**任何高面数网格**—�
 | ![全身，带纹理](docs/images/compare_full_textured.jpg) | ![全身，线框](docs/images/compare_full_wireframe.jpg) |
 | ![特写，带纹理](docs/images/compare_closeup_textured.jpg) | ![特写，线框](docs/images/compare_closeup_wireframe.jpg) |
 
-原始模型（左）与 BakeDown（右）：49,988 → 2,734 个三角面，近似形变 7.3 mm（0.56%），4K 烘焙。
+原始模型（左）与 BakeDown（右）：49,988 → 3,000 个三角面，近似形变 1.8 mm（0.14%），4K 烘焙。
 
 ## 功能
 

@@ -1,8 +1,8 @@
-# Verification — BakeDown 1.4.1
+# Verification — BakeDown 1.5.0
 
 ## Automated (headless Blender)
 
-`tests/run_tests.py` — **20/20 PASS** on Blender **5.1.2** and **4.5.0** (macOS):
+`tests/run_tests.py` — **25/25 PASS** on Blender **5.1.2** and **4.5.0** (macOS):
 
 | Test | Checks |
 |---|---|
@@ -25,6 +25,11 @@
 | `api_accepts_objects_linked_from_code` | an object created with `bpy.data.objects.new` + link is accepted by the API |
 | `api_errors_are_readable` | wrong arguments raise `BakeDownError` with a clear message |
 | `cli_processes_a_file_and_reports_json` | CLI turns a .glb into a baked GLB with LODs and a JSON report; exit code 1 on a missing file |
+| `metallic_albedo_is_not_darkened` | a fully metallic material bakes its exact base colour |
+| `faceted_original_gets_faceted_shading` | faceted originals get flat / by-angle shading, smooth ones stay smooth |
+| `triangle_budget_is_used` | the result lands within 3 % below the requested triangle count |
+| `api_normal_strength_sticks` | `bake(normal_strength=…)` survives the settings restore; default 1.0 |
+| `normal_map_repair_flattens_misses` | sideways / backward tangent normals are flattened, valid ones kept |
 | `translations_complete` | every UI string has ru / es / de / zh translations with matching placeholders |
 
 A live check with Blender's interface language switched to `ru_RU`, `es`, `de_DE` and `zh_HANS` shows the translated strings.
@@ -32,6 +37,23 @@ A live check with Blender's interface language switched to `ru_RU`, `es`, `de_DE
 ## Desktop runs (Blender 5.1.2 GUI, macOS)
 
 A scripted GUI session built a 251,904-triangle textured mesh, simplified it to 2,713 triangles (≈0.37% distortion), ran the real modal Cycles bake at 2K (Base Color, Roughness, Metallic, Normal — finished, no rollback), and exported a Unity FBX with four PNG maps. The README comparison screenshots come from a second GUI run on a 49,988-triangle character (2,734 after Simplify, 4K bake). Versions 1.3.0 and 1.4.0 repeated the modal bake and Unity FBX export successfully. In 1.4.0 the CLI processed the same character headless in 4.8 s (2,734 triangles, 2K bake, LOD 2,734 / 1,366 / 682 / 272, Unity FBX + 4 PNG).
+
+## Quality measurements (`tools/quality_eval.py`)
+
+Four orthographic views of original vs result, per-pixel error (0–255, lower is better) over the shared silhouette: *shape* = Workbench studio light, plain colour; *colour* = base-colour texture, flat light; *full* = EEVEE with materials and the normal map; *close-up* = full render of the top quarter at about texture resolution. *geo mean* = mean two-way surface distance in % of object size. 2K bake.
+
+Test models: a stylised Hunyuan character (49,988 triangles, faceted) and a metallic sculpt (251,904 triangles, smooth, procedural material).
+
+| Model, target | Triangles | geo mean % | Shape | Colour | Full | Close-up |
+|---|---|---|---|---|---|---|
+| Character, 1k | 964 → 1,000 | 0.114 → 0.108 | 19.2 → 6.9 | 8.4 → 1.3 | 10.5 → 3.1 | 9.3 → 4.1 |
+| Character, 3k | 2,734 → 3,000 | 0.023 → 0.014 | 13.5 → 3.0 | 6.9 → 0.4 | 7.4 → 1.9 | 7.6 → 2.2 |
+| Character, 10k | 7,750 → 10,000 | 0.013 → 0.005 | 10.1 → 2.7 | 7.0 → 0.3 | 6.6 → 1.8 | 7.0 → 2.1 |
+| Sculpt, 1k | 971 → 999 | 0.115 → 0.110 | 9.4 → 8.7 | — | 21.5 → 1.8 | 31.0 → 3.1 |
+| Sculpt, 3k | 2,713 → 2,999 | 0.051 → 0.047 | 6.7 → 6.3 | — | 21.1 → 0.8 | 29.4 → 1.2 |
+| Sculpt, 10k | 8,952 → 10,000 | 0.022 → 0.019 | 5.2 → 4.7 | — | 21.1 → 0.4 | 29.5 → 0.7 |
+
+Values: 1.4.1 → 1.5.0. Tried and **not** kept because they did not measurably help: average-island-scale and concave UV packing (lower utilisation, 3–4× slower bake), 8 bake samples, half / double automatic ray distance, automatic symmetric decimation, disabling the pre-collapse planar dissolve.
 
 ## Blender MCP run (user's Blender 5.1.2, live scene)
 

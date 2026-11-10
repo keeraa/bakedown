@@ -13,9 +13,9 @@
 [![UI: EN · RU · ES · DE · ZH](https://img.shields.io/badge/UI-EN%20·%20RU%20·%20ES%20·%20DE%20·%20ZH-555)](#idiomas-de-la-interfaz)
 [![AI agents ready](https://img.shields.io/badge/AI%20agents-ready-8A2BE2)](AGENTS.md)
 
-<img src="docs/images/bakedown_hero.gif" width="640" alt="Original de 49.988 triángulos frente a BakeDown con 2.734: el mismo aspecto con un 95 % menos de triángulos">
+<img src="docs/images/bakedown_hero.gif" width="640" alt="Original de 49.988 triángulos frente a BakeDown con 3.000: el mismo aspecto con un 94 % menos de triángulos">
 
-**−95 % de triángulos · el mismo aspecto · texturas PBR horneadas en segundos**
+**−94 % de triángulos · el mismo aspecto · texturas PBR horneadas en segundos**
 
 [**⬇ Descargar**](https://github.com/keeraa/bakedown/releases/latest) · [▶ Demo de 40 segundos](docs/media/bakedown_demo.mp4) · [🤖 Para agentes de IA](AGENTS.md) · [❓ Preguntas frecuentes](docs/FAQ.md)
 
@@ -45,7 +45,9 @@ Personajes: **Simplificar → Hornear → Rig → LOD → Exportar** (los LOD cr
 | Exportar al motor | recordar ejes, escala, suavizado, formato de normales | ✅ preajustes Unity / Unreal / glTF |
 | Automatización | escribir y depurar scripts `bpy` | ✅ API de Python y línea de comandos con informe JSON |
 
-Un personaje de 50.000 triángulos pasa a 2.700 con horneado PBR 2K, cuatro LOD y un FBX para Unity en **unos 5 segundos**.
+Un personaje de 50.000 triángulos pasa a 3.000 con horneado PBR 2K, cuatro LOD y un FBX para Unity en **unos 5 segundos**.
+
+La calidad se mide, no se estima a ojo: [`tools/quality_eval.py`](tools/quality_eval.py) renderiza el original y el resultado desde cuatro lados y compara forma, color y silueta. La versión 1.5 redujo el error del render completo de 3 a 4 veces en un personaje estilizado y de 10 a 40 veces en una escultura metálica; detalles en [docs/VERIFICATION.md](docs/VERIFICATION.md).
 
 ## Compara tú mismo
 
@@ -54,7 +56,7 @@ Un personaje de 50.000 triángulos pasa a 2.700 con horneado PBR 2K, cuatro LOD 
 | ![Figura completa, con texturas](docs/images/compare_full_textured.jpg) | ![Figura completa, malla](docs/images/compare_full_wireframe.jpg) |
 | ![Primer plano, con texturas](docs/images/compare_closeup_textured.jpg) | ![Primer plano, malla](docs/images/compare_closeup_wireframe.jpg) |
 
-Original (izquierda) frente a BakeDown (derecha): 49.988 → 2.734 triángulos, distorsión aprox. 7,3 mm (0,56 %), horneado 4K.
+Original (izquierda) frente a BakeDown (derecha): 49.988 → 3.000 triángulos, distorsión aprox. 1,8 mm (0,14 %), horneado 4K.
 
 ## Qué incluye
 

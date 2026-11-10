@@ -25,7 +25,7 @@ Rays missed the original surface. Open **2 — Texture → Settings** and increa
 
 ## The baked colours look slightly darker / sharper than the original
 
-Check **Sharpen** (0 = off) and **Normal strength** — both change the look without a new bake (Normal strength is live).
+Since 1.5 the base colour is baked exactly (also for metallic materials) and Normal strength defaults to 1.0. If the result still looks different, check **Sharpen** (0 = off) and **Normal strength** — Normal strength is live and needs no new bake.
 
 ## Can I cancel a bake?
 
@@ -46,6 +46,10 @@ Unreal uses DirectX normal maps: enable **Flip normal-map green channel** when e
 ## Do LODs share the textures?
 
 Yes — LOD0–LOD3 use the same baked texture set and UVs. Objects are named `<name>_LOD0…3`, so Unity builds a LOD Group automatically. If you simplify or bake again after generating LODs, BakeDown marks them as out of date and refuses to export them until you regenerate.
+
+## Why is my result flat-shaded (or smooth)?
+
+BakeDown picks the shading of the simplified mesh automatically: it tries smooth, smooth by angle and flat shading and keeps the one closest to how the original is shaded. Stylised low-poly models stay faceted, organic sculpts stay smooth; LODs reuse the choice. You can still change shading afterwards in Blender (Object → Shade Smooth / Flat / Auto Smooth).
 
 ## Should I triangulate?
 
