@@ -1,90 +1,73 @@
+<div align="center">
+
 # BakeDown
+
+**高面数 3D 模型 → 可直接用于游戏的资产，就在 Blender 里完成。**
 
 [English](README.md) · [Русский](README.ru.md) · [Español](README.es.md) · [Deutsch](README.de.md) · **简体中文**
 
-**版本 1.4.1 · Blender 4.5+ · GPL-3.0-or-later**
+[![Blender 4.5+](https://img.shields.io/badge/Blender-4.5%2B-E87D0D?logo=blender&logoColor=white)](https://www.blender.org/download/)
+[![Latest release](https://img.shields.io/github/v/release/keeraa/bakedown?label=release&color=2ea44f)](https://github.com/keeraa/bakedown/releases/latest)
+[![Tests](https://github.com/keeraa/bakedown/actions/workflows/tests.yml/badge.svg)](https://github.com/keeraa/bakedown/actions/workflows/tests.yml)
+[![License: GPL-3.0-or-later](https://img.shields.io/badge/license-GPL--3.0--or--later-blue)](LICENSE)
+[![UI: EN · RU · ES · DE · ZH](https://img.shields.io/badge/UI-EN%20·%20RU%20·%20ES%20·%20DE%20·%20ZH-555)](#界面语言)
+[![AI agents ready](https://img.shields.io/badge/AI%20agents-ready-8A2BE2)](AGENTS.md)
 
-BakeDown 是一款 Blender 插件，可将 AI 生成和摄影测量得到的高面数网格（Hunyuan、Meshy、Tripo、Rodin、扫描模型——通常 5 万面以上并带一张 4K 纹理）转换为**可直接用于游戏的资产**。它只简化活动网格，把原始模型的 PBR 纹理烘焙到轻量网格上，生成 LOD，迁移骨骼绑定，并导出到 Unity、Unreal Engine 或 glTF。
+<img src="docs/images/bakedown_hero.gif" width="640" alt="原始模型 49,988 个三角面，BakeDown 结果 2,734 个三角面：外观不变，三角面减少 95%">
 
-它适用于**任何高面数网格**，不仅限于 AI 生成的模型：3D 扫描、雕刻模型、素材商店或拼装（kitbash）的高模，以及转换后的 CAD 模型。
+**三角面减少 95% · 外观不变 · 数秒完成 PBR 纹理烘焙**
 
-整个流程是**非破坏性**的：原始模型保存为备份，可以随意尝试不同参数，**重置**即可恢复原状。
+[**⬇ 下载**](https://github.com/keeraa/bakedown/releases/latest) · [▶ 40 秒演示](docs/media/bakedown_demo.mp4) · [🤖 AI 智能体](AGENTS.md) · [❓ 常见问题](docs/FAQ.md)
 
-作者：**Kirill Migachev**
+</div>
 
-[![BakeDown 演示：49,988 → 2,734 个三角面，随后进行 4K 纹理烘焙](docs/images/demo_poster.jpg)](docs/media/bakedown_demo.mp4)
+---
 
-▶ **[观看 40 秒演示](docs/media/bakedown_demo.mp4)**
+BakeDown 是一款免费的 Blender 插件，可将**任何高面数网格**——AI 生成的模型（Hunyuan、Meshy、Tripo、Rodin）、3D 扫描、雕刻模型、素材商店或拼装（kitbash）的高模——转换为轻量、带纹理、可直接用于游戏的资产。它会简化网格、把原始模型的纹理烘焙到新网格上、生成 LOD、迁移骨骼绑定，并导出到 Unity、Unreal Engine 或 glTF。整个流程是非破坏性的：原始模型会被保留，**重置**即可恢复。
 
-### 外观不变，三角面减少 95%
+## 快速开始
 
-| 全身，带纹理 | 全身，线框 |
+1. 从[最新发布版](https://github.com/keeraa/bakedown/releases/latest)**下载** `bakedown.py`。
+2. 在 Blender 中：**Edit → Preferences → Add-ons → Install from Disk…**，选择 `bakedown.py`，启用 **BakeDown — Game Asset Optimizer**。
+3. 选中模型，按 **N**，打开 **BakeDown** 标签页：**简化 → 烘焙 → 导出**。
+
+角色：**简化 → 烘焙 → 绑定 → LOD → 导出**（在绑定之后生成的 LOD 会继承骨架）。
+
+## 为什么选择 BakeDown
+
+| | 在 Blender 中手动操作 | **BakeDown** |
+|---|---|---|
+| 保留原始模型、随时撤销 | 自己复制并管理 | ✅ 自动备份，一键**重置** |
+| 控制结果 | 猜测 Decimate 比例 | ✅ 按三角面数**或**允许的形状误差设定目标，以毫米和百分比显示 |
+| 清理 AI 网格和扫描模型 | 手动合并顶点、清理游离部分、修复法线和自定义拆分法线 | ✅ 内置于**简化** |
+| 保持外观 | 手动设置 4 次“选中到活动”烘焙、UV 和材质 | ✅ 一键烘焙基础色、糙度、金属度和法线，取消时自动回滚 |
+| LOD | 复制、精简、重新绑定、重命名 | ✅ LOD0–LOD3 预设，共用纹理，支持骨架，过期 LOD 提醒 |
+| 导出到引擎 | 记住坐标轴、缩放、平滑和法线格式 | ✅ Unity / Unreal / glTF 预设 |
+| 自动化 | 编写并调试 `bpy` 脚本 | ✅ Python API 和命令行工具，输出 JSON 报告 |
+
+一个 5 万面的角色，**约 5 秒**即可变为 2.7 千面，并完成 2K PBR 烘焙、四级 LOD 和 Unity FBX 导出。
+
+## 效果对比
+
+| 带纹理 | 线框 |
 |---|---|
 | ![全身，带纹理](docs/images/compare_full_textured.jpg) | ![全身，线框](docs/images/compare_full_wireframe.jpg) |
-| **特写，带纹理** | **特写，线框** |
 | ![特写，带纹理](docs/images/compare_closeup_textured.jpg) | ![特写，线框](docs/images/compare_closeup_wireframe.jpg) |
 
-原始模型（左）与 BakeDown 结果（右）：49,988 → 2,734 个三角面，近似形变 7.3 mm（0.56%），4K 烘焙。
-
-## 安装
-
-1. 从[最新发布版](https://github.com/keeraa/bakedown/releases/latest)下载 `bakedown.py`。
-2. 在 Blender 中：**Edit → Preferences → Add-ons → Install from Disk…**，选择 `bakedown.py`。
-3. 启用 **BakeDown — Game Asset Optimizer**。
-4. 按 **N** 打开 3D 视图侧边栏，选择 **BakeDown** 标签页。
-
-更新时，用新的 `bakedown.py` 覆盖安装并重启 Blender。
-
-## 工作流程
-
-静态物体（建筑、道具）：
-
-```text
-简化 → 烘焙 → （LOD）→ 导出
-```
-
-角色：
-
-```text
-简化 → 烘焙 → 绑定 → LOD → 导出
-```
-
-请在绑定**之后**生成 LOD，这样各级 LOD 会继承骨架。选中多个物体时，BakeDown 只处理活动网格（轮廓更亮的那个）。
+原始模型（左）与 BakeDown（右）：49,988 → 2,734 个三角面，近似形变 7.3 mm（0.56%），4K 烘焙。
 
 ## 功能
 
-### 简化
-- 按实际三角面数（滑块 + 1K/3K/5K/10K/20K 预设）或按近似形变预算（二分查找自动确定三角面数）设定目标。
-- 合并顶点、清理游离几何体、修复法线（包括 AI 网格的自定义拆分法线）、平面融并和塌陷精简；可选填充孔洞、删除内部面、压平平面和显式三角化。
-- 在面板中直接显示以毫米和物体尺寸百分比表示的形变估计。
-- **形状**检查视图（实体 + MatCap + 线框）以及原始 ↔ 结果**对比**。
-
-### 纹理烘焙
-- 使用 Cycles 将基础色、糙度、金属度以及可选的切线空间法线贴图烘焙到新的 UV 展开上，支持 1K/2K/4K。
-- 模态运行，带进度和取消；取消或出错时完整回滚。
-- 自动射线距离、实时法线强度、基础色锐化。
-
-### LOD
-- LOD0–LOD3，提供策略、3D 射击、移动端和自定义预设。所有 LOD 共用一套纹理。
-- 支持骨架：已绑定网格的 LOD 会继承骨架和权重。
-- 命名为 `<物体>_LOD0..3`，Unity 会自动创建 LOD Group。
-- 重新简化或烘焙后若 LOD 已过期会给出提示，并拒绝导出过期的 LOD。
-
-### 绑定迁移
-- 导入带蒙皮的 FBX 作为模板，把骨架和顶点权重迁移到活动网格（适用于相似的人形角色）。
-- 在静止姿态（Rest Position）下工作，出错时也会恢复原有姿态状态。
-
-### 导出
-- Unity 用 FBX、Unreal 用 FBX（平滑组）以及独立 GLB。
-- 模型和 PNG 纹理保存在以 .blend 文件命名的子文件夹中；FBX 以相对路径引用 PNG。
-- 选项：翻转法线贴图绿色通道（DirectX 约定）、打包 ORM。
-- 可导出单个物体，或将其整个 LOD 集合（连同骨架）导出为一个文件。
+- **简化** — 按实际三角面数或形变预算设定目标，清理 AI 网格和扫描模型，平面融并、塌陷；可选填充孔洞、删除内部面、压平平面和三角化。只修改活动网格。
+- **烘焙** — 使用 Cycles 将基础色、糙度、金属度和切线空间法线烘焙到新的 UV 展开上，支持 1K/2K/4K；自动射线距离、实时法线强度、锐化；显示进度，按 Esc 取消，完整回滚。
+- **LOD** — LOD0–LOD3，提供策略 / 3D 射击 / 移动端 / 自定义预设，共用一套纹理，支持骨架，`_LOD0…3` 命名可被 Unity 自动识别为 LOD Group。
+- **绑定迁移** — 导入带蒙皮的 FBX 模板，把骨架和权重迁移到活动网格。
+- **导出** — Unity 用 FBX、Unreal 用 FBX、独立 GLB；PNG 贴图保存在模型旁，支持 ORM 打包，为 Unreal 转换 DirectX 法线。
+- **检查** — 形状模式（MatCap + 线框）以及原始 ↔ 结果对比。
 
 ## 配合 AI 智能体使用
 
-AI 智能体（Claude、ChatGPT、Codex、Blender MCP 等）可以直接调用 BakeDown，而不必自己编写 Blender 代码。在作者的测试中，通过 BakeDown 工作的智能体产出的资产明显优于同一智能体自行编写简化和烘焙脚本的结果。
-
-两种接入方式，都会返回 JSON 报告（三角面数、形变、烘焙贴图、LOD、导出文件）：
+AI 智能体（Claude、ChatGPT、Codex、Blender MCP 等）可以直接调用 BakeDown，而不必自行编写 Blender 代码；在作者的测试中，这样得到的资产明显更好。两种接入方式都会返回 JSON 报告（三角面数、形变、烘焙贴图、LOD、导出文件）：
 
 ```bash
 blender -b --factory-startup --python tools/bakedown_cli.py -- model.glb --out ./out --triangles 3000 --resolution 2048 --engine unity
@@ -95,34 +78,20 @@ import bakedown
 report = bakedown.process(obj, triangles=3000, resolution=2048, export_dir="/tmp/out", engine="UNITY")
 ```
 
-智能体完整说明：[AGENTS.md](AGENTS.md)（英文）。
+智能体说明：[AGENTS.md](AGENTS.md)（英文）。
 
 ## 界面语言
 
-界面源语言为英语，内置**俄语、西班牙语、德语和简体中文**翻译；当 Blender 界面语言设置为相应语言时会自动显示（**Preferences → Interface → Translation**）。
+英语、俄语、西班牙语、德语和简体中文——Blender 会根据 **Preferences → Interface → Translation** 自动切换。
 
-## 使用建议
+## 常见问题
 
-- 烘焙使用 CPU 上的 Cycles：4K 分辨率下每个物体需要几十秒到几分钟。
-- 烘焙后出现黑斑 → 增大**射线距离**；细节发糊 → 改回 0（自动）。
-- 默认不进行三角化：引擎导入时会自行三角化，GPU 开销相同。
-- 对于 Mixamo 动画：只需绑定一次；动画作为单独的 FBX，在 Unity 中通过 Humanoid Avatar 重定向。
+三角面目标、形变、烘焙后出现黑斑、带绑定的角色、Unity 和 Unreal 的注意事项以及限制：[docs/FAQ.md](docs/FAQ.md)（英文）。
 
-## 限制
+## 参与贡献
 
-- 形变是近似的采样指标，而非精确的豪斯多夫距离。
-- 正在进行的烘焙步骤无法中断；取消会在两张贴图之间生效。
-- 内部面检测为实验功能，默认关闭。
-- 导入引擎前请检查异常的负缩放和非等比缩放。
-
-## 开发
-
-架构与注意事项见 [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md)（英文），测试状态见 [docs/VERIFICATION.md](docs/VERIFICATION.md)。无界面运行测试：
-
-```bash
-/Applications/Blender.app/Contents/MacOS/Blender -b --factory-startup --python-exit-code 1 --python tests/run_tests.py
-```
+欢迎提交问题报告和建议——[创建 issue](https://github.com/keeraa/bakedown/issues/new/choose)。开发者请参阅：[CONTRIBUTING.md](CONTRIBUTING.md)、[docs/DEVELOPMENT.md](docs/DEVELOPMENT.md)、[docs/VERIFICATION.md](docs/VERIFICATION.md)、[CHANGELOG.md](CHANGELOG.md)。
 
 ## 许可证
 
-GNU 通用公共许可证 v3.0 或更高版本。详见 [LICENSE](LICENSE)。
+GPL-3.0-or-later © Kirill Migachev。详见 [LICENSE](LICENSE)。

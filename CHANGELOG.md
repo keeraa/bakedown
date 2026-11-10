@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased
+
+### Documentation
+
+- New README layout in all five languages: badges, 10-second hero GIF, quick start, "Why BakeDown" comparison, compact feature list.
+- `docs/FAQ.md` (targets, distortion, baking problems, rigs, Unity/Unreal), `CONTRIBUTING.md`, issue and pull-request templates, social preview image.
+- GitHub Actions run the test suite on Blender 4.5 and 5.1 (Linux).
+
 ## 1.4.1 — 2026-11-10
 
 ### Fixed

@@ -1,90 +1,73 @@
+<div align="center">
+
 # BakeDown
+
+**Heavy 3D models → game-ready assets, right in Blender.**
 
 **English** · [Русский](README.ru.md) · [Español](README.es.md) · [Deutsch](README.de.md) · [简体中文](README.zh-CN.md)
 
-**Version 1.4.1 · Blender 4.5+ · GPL-3.0-or-later**
+[![Blender 4.5+](https://img.shields.io/badge/Blender-4.5%2B-E87D0D?logo=blender&logoColor=white)](https://www.blender.org/download/)
+[![Latest release](https://img.shields.io/github/v/release/keeraa/bakedown?label=release&color=2ea44f)](https://github.com/keeraa/bakedown/releases/latest)
+[![Tests](https://github.com/keeraa/bakedown/actions/workflows/tests.yml/badge.svg)](https://github.com/keeraa/bakedown/actions/workflows/tests.yml)
+[![License: GPL-3.0-or-later](https://img.shields.io/badge/license-GPL--3.0--or--later-blue)](LICENSE)
+[![UI: EN · RU · ES · DE · ZH](https://img.shields.io/badge/UI-EN%20·%20RU%20·%20ES%20·%20DE%20·%20ZH-555)](#interface-languages)
+[![AI agents ready](https://img.shields.io/badge/AI%20agents-ready-8A2BE2)](AGENTS.md)
 
-BakeDown is a Blender add-on that turns heavy AI-generated and photogrammetry meshes (Hunyuan, Meshy, Tripo, Rodin, scans — often 50k+ polygons with a single 4K texture) into **game-ready assets**. It simplifies only the active mesh, bakes PBR textures from the original onto the light mesh, generates LODs, transfers rigs, and exports to Unity, Unreal Engine or glTF.
+<img src="docs/images/bakedown_hero.gif" width="640" alt="Original 49,988 triangles vs BakeDown 2,734 triangles: same look, 95% fewer triangles">
 
-It works with **any heavy mesh**, not only AI output: 3D scans, sculpts, high-poly marketplace or kitbash models, CAD conversions.
+**−95% triangles · same look · PBR textures baked in seconds**
 
-The workflow is **non-destructive**: the original is kept as a backup, you can try different values freely, and **Reset** brings everything back.
+[**⬇ Download**](https://github.com/keeraa/bakedown/releases/latest) · [▶ 40-second demo](docs/media/bakedown_demo.mp4) · [🤖 For AI agents](AGENTS.md) · [❓ FAQ](docs/FAQ.md)
 
-Author: **Kirill Migachev**
+</div>
 
-[![BakeDown demo: 49,988 → 2,734 triangles, then a 4K texture bake](docs/images/demo_poster.jpg)](docs/media/bakedown_demo.mp4)
+---
 
-▶ **[Watch the 40-second demo](docs/media/bakedown_demo.mp4)**
+BakeDown is a free Blender add-on that turns **any heavy mesh** — AI-generated (Hunyuan, Meshy, Tripo, Rodin), 3D scans, sculpts, high-poly marketplace or kitbash models — into a light, textured, game-ready asset. It simplifies the mesh, bakes the original's textures onto it, builds LODs, transfers rigs and exports to Unity, Unreal Engine or glTF. Non-destructive: the original is kept and **Reset** brings it back.
 
-### Same look, 95% fewer triangles
+## Quick start
 
-| Full figure, textured | Full figure, wireframe |
+1. **Download** `bakedown.py` from the [latest release](https://github.com/keeraa/bakedown/releases/latest).
+2. In Blender: **Edit → Preferences → Add-ons → Install from Disk…**, select `bakedown.py`, enable **BakeDown — Game Asset Optimizer**.
+3. Select your model, press **N**, open the **BakeDown** tab: **Simplify → Bake → Export**.
+
+Characters: **Simplify → Bake → Rig → LOD → Export** (LODs made after the rig inherit the armature).
+
+## Why BakeDown
+
+| | Blender by hand | **BakeDown** |
+|---|---|---|
+| Keep the original, undo everything | duplicate and track it yourself | ✅ automatic backup, one-click **Reset** |
+| Choose the result | guess a Decimate ratio | ✅ target triangles **or** an allowed shape error, shown in mm and % |
+| Clean AI / scan meshes | weld, loose parts, normals, custom split normals by hand | ✅ built into **Simplify** |
+| Keep the look | set up 4 selected-to-active bakes, UVs, materials | ✅ Base Color, Roughness, Metallic, Normal in one click, rollback on cancel |
+| LODs | duplicate, decimate, re-rig, rename | ✅ LOD0–LOD3 presets, shared textures, armature-aware, stale-LOD warning |
+| Engine export | remember axis, scale, smoothing, normal-map rules | ✅ Unity / Unreal / glTF presets |
+| Automation | write and debug `bpy` scripts | ✅ Python API + CLI with a JSON report |
+
+A 50k-triangle character becomes 2.7k triangles with a 2K PBR bake, four LODs and a Unity FBX in **about 5 seconds**.
+
+## See the difference
+
+| Textured | Wireframe |
 |---|---|
 | ![Full figure, textured](docs/images/compare_full_textured.jpg) | ![Full figure, wireframe](docs/images/compare_full_wireframe.jpg) |
-| **Close-up, textured** | **Close-up, wireframe** |
 | ![Close-up, textured](docs/images/compare_closeup_textured.jpg) | ![Close-up, wireframe](docs/images/compare_closeup_wireframe.jpg) |
 
-Original (left) vs BakeDown result (right): 49,988 → 2,734 triangles, approx. distortion 7.3 mm (0.56%), 4K bake.
+Original (left) vs BakeDown (right): 49,988 → 2,734 triangles, approx. distortion 7.3 mm (0.56%), 4K bake.
 
-## Installation
+## What's inside
 
-1. Download `bakedown.py` from the [latest release](https://github.com/keeraa/bakedown/releases/latest).
-2. In Blender: **Edit → Preferences → Add-ons → Install from Disk…** and select `bakedown.py`.
-3. Enable **BakeDown — Game Asset Optimizer**.
-4. Open the 3D View sidebar with **N** and select the **BakeDown** tab.
-
-To update, install the new `bakedown.py` over the old one and restart Blender.
-
-## Workflow
-
-Static asset (building, prop):
-
-```text
-Simplify → Bake → (LOD) → Export
-```
-
-Character:
-
-```text
-Simplify → Bake → Rig → LOD → Export
-```
-
-Generate LODs **after** the rig so they inherit the armature. When several objects are selected, BakeDown processes only the active mesh (the one with the brighter outline).
-
-## Features
-
-### Simplification
-- Target by real triangle count (slider + 1K/3K/5K/10K/20K presets) or by an approximate distortion budget (binary search finds the triangle count).
-- Weld, loose-geometry cleanup, normal fixes (including custom split normals from AI meshes), planar dissolve, collapse decimation; optional hole filling, interior-face removal, plane flattening and explicit triangulation.
-- Distortion estimate in millimetres and % of object size right in the panel.
-- **Shape** inspection (Solid + MatCap + wireframe) and **Compare** original ↔ result.
-
-### Texture baking
-- Cycles bake of Base Color, Roughness, Metallic and an optional tangent-space Normal map onto a fresh UV layout, at 1K/2K/4K.
-- Modal, with progress and cancellation; transactional rollback on cancel or error.
-- Automatic ray distance, live Normal strength, Base Color sharpening.
-
-### LOD
-- LOD0–LOD3 with Strategy, 3D Shooter, Mobile and Custom presets. All LODs share one texture set.
-- Armature-aware: LODs of a rigged mesh inherit the armature and weights.
-- Naming `<object>_LOD0..3`, so Unity builds a LOD Group automatically.
-- Warns when LODs are out of date after a new Simplify or Bake, and refuses to export stale LODs.
-
-### Rig transfer
-- Import a skinned FBX as a template and transfer the armature and vertex weights to the active mesh (for similar humanoids).
-- Works in Rest Position and restores the pose state even after an error.
-
-### Export
-- Unity FBX, Unreal FBX (smoothing groups) and self-contained GLB.
-- Model and PNG textures go into a sub-folder named after the .blend file; FBX references the PNGs with relative paths.
-- Options: normal-map green-channel flip (DirectX convention), ORM packing.
-- Exports a single object or its whole LOD collection (with the armature) as one file.
+- **Simplify** — real-triangle or distortion-budget target, cleanup of AI/scan meshes, planar dissolve, collapse; optional hole filling, interior-face removal, flattening, triangulation. Only the active mesh is touched.
+- **Bake** — Cycles bake of Base Color, Roughness, Metallic and tangent Normal onto a fresh UV layout at 1K/2K/4K; automatic ray distance, live normal strength, sharpening; progress, Esc to cancel, full rollback.
+- **LOD** — LOD0–LOD3 with Strategy / 3D Shooter / Mobile / Custom presets, one shared texture set, armature-aware, `_LOD0…3` naming for Unity LOD Groups.
+- **Rig transfer** — import a skinned FBX template and transfer armature and weights to the active mesh.
+- **Export** — Unity FBX, Unreal FBX, self-contained GLB; PNG maps next to the model, ORM packing, DirectX normal flip for Unreal.
+- **Inspect** — Shape mode (MatCap + wireframe) and Compare original ↔ result.
 
 ## Use with AI agents
 
-AI agents (Claude, ChatGPT, Codex, Blender MCP…) can drive BakeDown instead of writing their own Blender code. In the author's tests an agent working through BakeDown produced noticeably better assets than the same agent improvising decimation and baking scripts.
-
-Two entry points, both return a JSON report (triangles, distortion, baked maps, LODs, exported files):
+AI agents (Claude, ChatGPT, Codex, Blender MCP…) can drive BakeDown instead of improvising their own Blender code — in the author's tests that gave noticeably better assets. Both entry points return a JSON report (triangles, distortion, baked maps, LODs, exported files):
 
 ```bash
 blender -b --factory-startup --python tools/bakedown_cli.py -- model.glb --out ./out --triangles 3000 --resolution 2048 --engine unity
@@ -95,34 +78,20 @@ import bakedown
 report = bakedown.process(obj, triangles=3000, resolution=2048, export_dir="/tmp/out", engine="UNITY")
 ```
 
-Full instructions for agents: [AGENTS.md](AGENTS.md).
+Instructions for agents: [AGENTS.md](AGENTS.md).
 
 ## Interface languages
 
-The source interface is English. Translations are included for **Russian, Spanish, German and Simplified Chinese**; Blender shows them automatically when its interface language is set accordingly (**Preferences → Interface → Translation**).
+English, Russian, Spanish, German and Simplified Chinese — Blender switches automatically with **Preferences → Interface → Translation**.
 
-## Tips
+## FAQ
 
-- Baking uses Cycles on the CPU: from tens of seconds to a couple of minutes per object at 4K.
-- Black spots after baking → increase **Ray distance**; smeared thin details → set it back to 0 (auto).
-- Triangulation is off by default: engines triangulate on import, and the GPU cost is the same.
-- For Mixamo animations: rig once; animations are separate FBX files retargeted in Unity through a Humanoid Avatar.
+Targets, distortion, black spots after baking, rigged characters, Unity/Unreal specifics and limitations: [docs/FAQ.md](docs/FAQ.md).
 
-## Limitations
+## Contributing
 
-- Distortion is an approximate sampled metric, not an exact Hausdorff distance.
-- A running bake pass cannot be interrupted; cancellation takes effect between maps.
-- Interior-face detection is experimental and off by default.
-- Review unusual negative and non-uniform transforms before engine import.
-
-## Development
-
-See [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) for the architecture and pitfalls, and [docs/VERIFICATION.md](docs/VERIFICATION.md) for the test status. Headless tests:
-
-```bash
-/Applications/Blender.app/Contents/MacOS/Blender -b --factory-startup --python-exit-code 1 --python tests/run_tests.py
-```
+Bug reports and ideas are welcome — [open an issue](https://github.com/keeraa/bakedown/issues/new/choose). Developers: [CONTRIBUTING.md](CONTRIBUTING.md), [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md), [docs/VERIFICATION.md](docs/VERIFICATION.md), [CHANGELOG.md](CHANGELOG.md).
 
 ## License
 
-GNU General Public License v3.0 or later. See [LICENSE](LICENSE).
+GPL-3.0-or-later © Kirill Migachev. See [LICENSE](LICENSE).

@@ -1,0 +1,17 @@
+name: Feature request
+description: Suggest an idea for BakeDown
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What are you trying to do?
+      description: Describe the asset and the workflow, e.g. "mobile game, 200 props from Meshy".
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: What would help?
+    validations:
+      required: true

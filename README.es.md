@@ -1,90 +1,73 @@
+<div align="center">
+
 # BakeDown
+
+**Modelos 3D pesados → assets listos para juegos, directamente en Blender.**
 
 [English](README.md) · [Русский](README.ru.md) · **Español** · [Deutsch](README.de.md) · [简体中文](README.zh-CN.md)
 
-**Versión 1.4.1 · Blender 4.5+ · GPL-3.0-or-later**
+[![Blender 4.5+](https://img.shields.io/badge/Blender-4.5%2B-E87D0D?logo=blender&logoColor=white)](https://www.blender.org/download/)
+[![Latest release](https://img.shields.io/github/v/release/keeraa/bakedown?label=release&color=2ea44f)](https://github.com/keeraa/bakedown/releases/latest)
+[![Tests](https://github.com/keeraa/bakedown/actions/workflows/tests.yml/badge.svg)](https://github.com/keeraa/bakedown/actions/workflows/tests.yml)
+[![License: GPL-3.0-or-later](https://img.shields.io/badge/license-GPL--3.0--or--later-blue)](LICENSE)
+[![UI: EN · RU · ES · DE · ZH](https://img.shields.io/badge/UI-EN%20·%20RU%20·%20ES%20·%20DE%20·%20ZH-555)](#idiomas-de-la-interfaz)
+[![AI agents ready](https://img.shields.io/badge/AI%20agents-ready-8A2BE2)](AGENTS.md)
 
-BakeDown es un complemento de Blender que convierte mallas pesadas generadas por IA o por fotogrametría (Hunyuan, Meshy, Tripo, Rodin, escaneos — a menudo 50k+ polígonos con una sola textura 4K) en **assets listos para juegos**. Simplifica solo la malla activa, hornea texturas PBR del original sobre la malla ligera, genera LOD, transfiere rigs y exporta a Unity, Unreal Engine o glTF.
+<img src="docs/images/bakedown_hero.gif" width="640" alt="Original de 49.988 triángulos frente a BakeDown con 2.734: el mismo aspecto con un 95 % menos de triángulos">
 
-Funciona con **cualquier malla pesada**, no solo con resultados de IA: escaneos 3D, esculturas, modelos high-poly de tiendas o kitbash y conversiones de CAD.
+**−95 % de triángulos · el mismo aspecto · texturas PBR horneadas en segundos**
 
-El flujo es **no destructivo**: el original se guarda como copia de seguridad, puedes probar valores libremente y **Restablecer** lo devuelve todo a su estado.
+[**⬇ Descargar**](https://github.com/keeraa/bakedown/releases/latest) · [▶ Demo de 40 segundos](docs/media/bakedown_demo.mp4) · [🤖 Para agentes de IA](AGENTS.md) · [❓ Preguntas frecuentes](docs/FAQ.md)
 
-Autor: **Kirill Migachev**
+</div>
 
-[![Demo de BakeDown: 49.988 → 2.734 triángulos y horneado de texturas 4K](docs/images/demo_poster.jpg)](docs/media/bakedown_demo.mp4)
+---
 
-▶ **[Ver la demo de 40 segundos](docs/media/bakedown_demo.mp4)**
+BakeDown es un complemento gratuito de Blender que convierte **cualquier malla pesada** —generada por IA (Hunyuan, Meshy, Tripo, Rodin), escaneos 3D, esculturas, modelos high-poly de tiendas o kitbash— en un asset ligero, texturizado y listo para juegos. Simplifica la malla, hornea sobre ella las texturas del original, crea LOD, transfiere rigs y exporta a Unity, Unreal Engine o glTF. No destructivo: el original se conserva y **Restablecer** lo recupera.
 
-### El mismo aspecto con un 95 % menos de triángulos
+## Inicio rápido
 
-| Figura completa, con texturas | Figura completa, malla |
+1. **Descarga** `bakedown.py` de la [última versión](https://github.com/keeraa/bakedown/releases/latest).
+2. En Blender: **Edit → Preferences → Add-ons → Install from Disk…**, elige `bakedown.py` y activa **BakeDown — Game Asset Optimizer**.
+3. Selecciona tu modelo, pulsa **N** y abre la pestaña **BakeDown**: **Simplificar → Hornear → Exportar**.
+
+Personajes: **Simplificar → Hornear → Rig → LOD → Exportar** (los LOD creados después del rig heredan el esqueleto).
+
+## Por qué BakeDown
+
+| | A mano en Blender | **BakeDown** |
+|---|---|---|
+| Conservar el original y deshacerlo todo | duplicar y controlarlo tú | ✅ copia automática, **Restablecer** con un clic |
+| Elegir el resultado | adivinar el ratio de Decimate | ✅ objetivo en triángulos **o** en error de forma permitido, en mm y % |
+| Limpiar mallas de IA o escaneos | soldar, sueltos, normales, split normals a mano | ✅ integrado en **Simplificar** |
+| Mantener el aspecto | configurar 4 horneados selected-to-active, UV y materiales | ✅ Base Color, Roughness, Metallic y Normal en un clic, reversión al cancelar |
+| LOD | duplicar, diezmar, reasignar rig, renombrar | ✅ preajustes LOD0–LOD3, texturas compartidas, esqueleto incluido, aviso de LOD desactualizados |
+| Exportar al motor | recordar ejes, escala, suavizado, formato de normales | ✅ preajustes Unity / Unreal / glTF |
+| Automatización | escribir y depurar scripts `bpy` | ✅ API de Python y línea de comandos con informe JSON |
+
+Un personaje de 50.000 triángulos pasa a 2.700 con horneado PBR 2K, cuatro LOD y un FBX para Unity en **unos 5 segundos**.
+
+## Compara tú mismo
+
+| Con texturas | Malla |
 |---|---|
 | ![Figura completa, con texturas](docs/images/compare_full_textured.jpg) | ![Figura completa, malla](docs/images/compare_full_wireframe.jpg) |
-| **Primer plano, con texturas** | **Primer plano, malla** |
 | ![Primer plano, con texturas](docs/images/compare_closeup_textured.jpg) | ![Primer plano, malla](docs/images/compare_closeup_wireframe.jpg) |
 
-Original (izquierda) frente al resultado de BakeDown (derecha): 49.988 → 2.734 triángulos, distorsión aprox. 7,3 mm (0,56 %), horneado 4K.
+Original (izquierda) frente a BakeDown (derecha): 49.988 → 2.734 triángulos, distorsión aprox. 7,3 mm (0,56 %), horneado 4K.
 
-## Instalación
+## Qué incluye
 
-1. Descarga `bakedown.py` de la [última versión](https://github.com/keeraa/bakedown/releases/latest).
-2. En Blender: **Edit → Preferences → Add-ons → Install from Disk…** y elige `bakedown.py`.
-3. Activa **BakeDown — Game Asset Optimizer**.
-4. Abre la barra lateral de la vista 3D con **N** y selecciona la pestaña **BakeDown**.
-
-Para actualizar, instala el nuevo `bakedown.py` sobre el anterior y reinicia Blender.
-
-## Flujo de trabajo
-
-Objeto estático (edificio, accesorio):
-
-```text
-Simplificar → Hornear → (LOD) → Exportar
-```
-
-Personaje:
-
-```text
-Simplificar → Hornear → Rig → LOD → Exportar
-```
-
-Genera los LOD **después** del rig para que hereden el esqueleto. Si hay varios objetos seleccionados, BakeDown procesa solo la malla activa (la del contorno más claro).
-
-## Funciones
-
-### Simplificación
-- Objetivo por número real de triángulos (deslizador + preajustes 1K/3K/5K/10K/20K) o por margen de distorsión aproximado (una búsqueda binaria encuentra el número de triángulos).
-- Soldado de vértices, limpieza de geometría suelta, corrección de normales (incluidas las split normals personalizadas de mallas de IA), disolución de caras planas y diezmado Collapse; opcionalmente relleno de agujeros, eliminación de caras interiores, aplanado y triangulación explícita.
-- Estimación de distorsión en milímetros y % del tamaño del objeto directamente en el panel.
-- Inspección **Forma** (Solid + MatCap + malla de alambre) y **Comparar** original ↔ resultado.
-
-### Horneado de texturas
-- Horneado en Cycles de Base Color, Roughness, Metallic y un mapa de normales opcional en espacio tangente sobre un nuevo despliegue UV, a 1K/2K/4K.
-- Modal, con progreso y cancelación; reversión completa al cancelar o si hay un error.
-- Distancia de rayo automática, intensidad de normales en vivo, nitidez de Base Color.
-
-### LOD
-- LOD0–LOD3 con preajustes Estrategia, Shooter 3D, Móvil y Personalizado. Todos los LOD comparten un mismo juego de texturas.
-- Compatibles con esqueletos: los LOD de una malla con rig heredan el esqueleto y los pesos.
-- Nombres `<objeto>_LOD0..3`, así Unity crea el LOD Group automáticamente.
-- Avisa cuando los LOD quedan desactualizados tras una nueva simplificación u horneado, y no permite exportarlos.
-
-### Transferencia de rig
-- Importa un FBX con skinning como plantilla y transfiere el esqueleto y los pesos a la malla activa (para humanoides similares).
-- Trabaja en Rest Position y restaura el estado de la pose incluso tras un error.
-
-### Exportación
-- FBX para Unity, FBX para Unreal (smoothing groups) y GLB autónomo.
-- El modelo y las texturas PNG se guardan en una subcarpeta con el nombre del archivo .blend; el FBX referencia los PNG con rutas relativas.
-- Opciones: inversión del canal verde del mapa de normales (convención DirectX), empaquetado ORM.
-- Exporta un objeto o toda su colección de LOD (con el esqueleto) en un solo archivo.
+- **Simplificar** — objetivo en triángulos reales o en margen de distorsión, limpieza de mallas de IA y escaneos, disolución de caras planas, colapso; opcionalmente relleno de agujeros, eliminación de caras interiores, aplanado y triangulación. Solo se modifica la malla activa.
+- **Hornear** — horneado en Cycles de Base Color, Roughness, Metallic y Normal tangente sobre un nuevo despliegue UV a 1K/2K/4K; distancia de rayo automática, intensidad de normales en vivo, nitidez; progreso, Esc para cancelar, reversión completa.
+- **LOD** — LOD0–LOD3 con preajustes Estrategia / Shooter 3D / Móvil / Personalizado, un único juego de texturas, compatible con esqueletos, nombres `_LOD0…3` para LOD Groups de Unity.
+- **Transferencia de rig** — importa una plantilla FBX con skinning y transfiere esqueleto y pesos a la malla activa.
+- **Exportar** — FBX para Unity, FBX para Unreal, GLB autónomo; mapas PNG junto al modelo, empaquetado ORM, normales en formato DirectX para Unreal.
+- **Inspeccionar** — modo Forma (MatCap + malla de alambre) y Comparar original ↔ resultado.
 
 ## Uso con agentes de IA
 
-Los agentes de IA (Claude, ChatGPT, Codex, Blender MCP…) pueden manejar BakeDown en lugar de escribir su propio código para Blender. En las pruebas del autor, un agente que trabajaba con BakeDown obtuvo assets claramente mejores que el mismo agente improvisando scripts de diezmado y horneado.
-
-Dos puntos de entrada; ambos devuelven un informe JSON (triángulos, distorsión, mapas horneados, LOD, archivos exportados):
+Los agentes de IA (Claude, ChatGPT, Codex, Blender MCP…) pueden manejar BakeDown en lugar de improvisar su propio código de Blender; en las pruebas del autor esto dio assets claramente mejores. Ambos puntos de entrada devuelven un informe JSON (triángulos, distorsión, mapas horneados, LOD, archivos exportados):
 
 ```bash
 blender -b --factory-startup --python tools/bakedown_cli.py -- model.glb --out ./out --triangles 3000 --resolution 2048 --engine unity
@@ -95,34 +78,20 @@ import bakedown
 report = bakedown.process(obj, triangles=3000, resolution=2048, export_dir="/tmp/out", engine="UNITY")
 ```
 
-Instrucciones completas para agentes: [AGENTS.md](AGENTS.md) (en inglés).
+Instrucciones para agentes: [AGENTS.md](AGENTS.md) (en inglés).
 
 ## Idiomas de la interfaz
 
-El idioma original de la interfaz es el inglés. Incluye traducciones al **ruso, español, alemán y chino simplificado**; Blender las muestra automáticamente según su idioma de interfaz (**Preferences → Interface → Translation**).
+Inglés, ruso, español, alemán y chino simplificado; Blender cambia automáticamente con **Preferences → Interface → Translation**.
 
-## Consejos
+## Preguntas frecuentes
 
-- El horneado usa Cycles en CPU: de decenas de segundos a un par de minutos por objeto en 4K.
-- Manchas negras tras hornear → aumenta la **Distancia de rayo**; detalles finos borrosos → vuelve a 0 (auto).
-- La triangulación está desactivada por defecto: los motores triangulan al importar y el coste en GPU es el mismo.
-- Para animaciones de Mixamo: haz el rig una vez; las animaciones son FBX separados que se redirigen en Unity con un Humanoid Avatar.
+Objetivos de triángulos, distorsión, manchas negras tras hornear, personajes con rig, particularidades de Unity y Unreal y limitaciones: [docs/FAQ.md](docs/FAQ.md) (en inglés).
 
-## Limitaciones
+## Contribuir
 
-- La distorsión es una métrica aproximada por muestreo, no una distancia de Hausdorff exacta.
-- Un paso de horneado en curso no se puede interrumpir; la cancelación se aplica entre mapas.
-- La detección de caras interiores es experimental y está desactivada por defecto.
-- Revisa escalas negativas o no uniformes antes de importar en el motor.
-
-## Desarrollo
-
-Consulta [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) (en inglés) para la arquitectura y [docs/VERIFICATION.md](docs/VERIFICATION.md) para el estado de las pruebas. Pruebas sin interfaz:
-
-```bash
-/Applications/Blender.app/Contents/MacOS/Blender -b --factory-startup --python-exit-code 1 --python tests/run_tests.py
-```
+Los informes de errores y las ideas son bienvenidos: [abre un issue](https://github.com/keeraa/bakedown/issues/new/choose). Para desarrolladores: [CONTRIBUTING.md](CONTRIBUTING.md), [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md), [docs/VERIFICATION.md](docs/VERIFICATION.md), [CHANGELOG.md](CHANGELOG.md).
 
 ## Licencia
 
-GNU General Public License v3.0 o posterior. Consulta [LICENSE](LICENSE).
+GPL-3.0-or-later © Kirill Migachev. Consulta [LICENSE](LICENSE).

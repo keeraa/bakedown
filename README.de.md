@@ -1,90 +1,73 @@
+<div align="center">
+
 # BakeDown
+
+**Schwere 3D-Modelle → spielfertige Assets, direkt in Blender.**
 
 [English](README.md) · [Русский](README.ru.md) · [Español](README.es.md) · **Deutsch** · [简体中文](README.zh-CN.md)
 
-**Version 1.4.1 · Blender 4.5+ · GPL-3.0-or-later**
+[![Blender 4.5+](https://img.shields.io/badge/Blender-4.5%2B-E87D0D?logo=blender&logoColor=white)](https://www.blender.org/download/)
+[![Latest release](https://img.shields.io/github/v/release/keeraa/bakedown?label=release&color=2ea44f)](https://github.com/keeraa/bakedown/releases/latest)
+[![Tests](https://github.com/keeraa/bakedown/actions/workflows/tests.yml/badge.svg)](https://github.com/keeraa/bakedown/actions/workflows/tests.yml)
+[![License: GPL-3.0-or-later](https://img.shields.io/badge/license-GPL--3.0--or--later-blue)](LICENSE)
+[![UI: EN · RU · ES · DE · ZH](https://img.shields.io/badge/UI-EN%20·%20RU%20·%20ES%20·%20DE%20·%20ZH-555)](#sprachen-der-oberfläche)
+[![AI agents ready](https://img.shields.io/badge/AI%20agents-ready-8A2BE2)](AGENTS.md)
 
-BakeDown ist ein Blender-Add-on, das schwere KI-generierte und Photogrammetrie-Meshes (Hunyuan, Meshy, Tripo, Rodin, Scans — oft 50k+ Polygone mit einer einzigen 4K-Textur) in **spielfertige Assets** verwandelt. Es vereinfacht nur das aktive Mesh, backt PBR-Texturen vom Original auf das leichte Mesh, erzeugt LODs, überträgt Rigs und exportiert nach Unity, Unreal Engine oder glTF.
+<img src="docs/images/bakedown_hero.gif" width="640" alt="Original mit 49.988 Dreiecken und BakeDown mit 2.734 Dreiecken: gleiches Aussehen, 95 % weniger Dreiecke">
 
-Funktioniert mit **jedem schweren Mesh**, nicht nur mit KI-Ergebnissen: 3D-Scans, Sculpts, High-Poly-Modelle aus Marktplätzen oder Kitbash, konvertierte CAD-Daten.
+**−95 % Dreiecke · gleiches Aussehen · PBR-Texturen in Sekunden gebacken**
 
-Der Ablauf ist **nicht-destruktiv**: Das Original bleibt als Sicherung erhalten, Werte lassen sich frei ausprobieren, und **Zurücksetzen** stellt alles wieder her.
+[**⬇ Download**](https://github.com/keeraa/bakedown/releases/latest) · [▶ 40-Sekunden-Demo](docs/media/bakedown_demo.mp4) · [🤖 Für KI-Agenten](AGENTS.md) · [❓ FAQ](docs/FAQ.md)
 
-Autor: **Kirill Migachev**
+</div>
 
-[![BakeDown-Demo: 49.988 → 2.734 Dreiecke, danach Textur-Baking in 4K](docs/images/demo_poster.jpg)](docs/media/bakedown_demo.mp4)
+---
 
-▶ **[40-Sekunden-Demo ansehen](docs/media/bakedown_demo.mp4)**
+BakeDown ist ein kostenloses Blender-Add-on, das **jedes schwere Mesh** – KI-generiert (Hunyuan, Meshy, Tripo, Rodin), 3D-Scans, Sculpts, High-Poly-Modelle aus Marktplätzen oder Kitbash – in ein leichtes, texturiertes, spielfertiges Asset verwandelt. Es vereinfacht das Mesh, backt die Texturen des Originals darauf, erzeugt LODs, überträgt Rigs und exportiert nach Unity, Unreal Engine oder glTF. Nicht-destruktiv: Das Original bleibt erhalten, **Zurücksetzen** holt es zurück.
 
-### Gleiches Aussehen, 95 % weniger Dreiecke
+## Schnellstart
 
-| Ganze Figur, texturiert | Ganze Figur, Drahtgitter |
+1. `bakedown.py` aus dem [neuesten Release](https://github.com/keeraa/bakedown/releases/latest) **herunterladen**.
+2. In Blender: **Edit → Preferences → Add-ons → Install from Disk…**, `bakedown.py` wählen, **BakeDown — Game Asset Optimizer** aktivieren.
+3. Modell auswählen, **N** drücken, Reiter **BakeDown** öffnen: **Vereinfachen → Backen → Exportieren**.
+
+Charaktere: **Vereinfachen → Backen → Rig → LOD → Exportieren** (LODs nach dem Rig übernehmen das Skelett).
+
+## Warum BakeDown
+
+| | Von Hand in Blender | **BakeDown** |
+|---|---|---|
+| Original behalten, alles rückgängig machen | duplizieren und selbst verwalten | ✅ automatische Sicherung, **Zurücksetzen** mit einem Klick |
+| Ergebnis festlegen | Decimate-Ratio raten | ✅ Ziel in Dreiecken **oder** als erlaubter Formfehler, in mm und % |
+| KI-Meshes und Scans bereinigen | Verschweißen, lose Teile, Normalen, Split Normals von Hand | ✅ in **Vereinfachen** eingebaut |
+| Aussehen erhalten | 4 Selected-to-Active-Bakes, UVs und Materialien einrichten | ✅ Base Color, Roughness, Metallic, Normal mit einem Klick, Rollback bei Abbruch |
+| LODs | duplizieren, reduzieren, neu riggen, umbenennen | ✅ LOD0–LOD3-Presets, gemeinsame Texturen, Skelett-bewusst, Warnung bei veralteten LODs |
+| Engine-Export | Achsen, Skalierung, Glättung, Normal-Map-Format merken | ✅ Presets für Unity / Unreal / glTF |
+| Automatisierung | `bpy`-Skripte schreiben und debuggen | ✅ Python-API und Kommandozeile mit JSON-Bericht |
+
+Ein Charakter mit 50.000 Dreiecken wird in **etwa 5 Sekunden** zu 2.700 Dreiecken mit 2K-PBR-Bake, vier LODs und einem Unity-FBX.
+
+## Sieh selbst
+
+| Texturiert | Drahtgitter |
 |---|---|
 | ![Ganze Figur, texturiert](docs/images/compare_full_textured.jpg) | ![Ganze Figur, Drahtgitter](docs/images/compare_full_wireframe.jpg) |
-| **Nahaufnahme, texturiert** | **Nahaufnahme, Drahtgitter** |
 | ![Nahaufnahme, texturiert](docs/images/compare_closeup_textured.jpg) | ![Nahaufnahme, Drahtgitter](docs/images/compare_closeup_wireframe.jpg) |
 
-Original (links) und BakeDown-Ergebnis (rechts): 49.988 → 2.734 Dreiecke, ca. 7,3 mm Verzerrung (0,56 %), 4K-Baking.
+Original (links) und BakeDown (rechts): 49.988 → 2.734 Dreiecke, ca. 7,3 mm Verzerrung (0,56 %), 4K-Baking.
 
-## Installation
+## Was drin ist
 
-1. `bakedown.py` aus dem [neuesten Release](https://github.com/keeraa/bakedown/releases/latest) herunterladen.
-2. In Blender: **Edit → Preferences → Add-ons → Install from Disk…** und `bakedown.py` auswählen.
-3. **BakeDown — Game Asset Optimizer** aktivieren.
-4. Die Seitenleiste der 3D-Ansicht mit **N** öffnen und den Reiter **BakeDown** wählen.
-
-Zum Aktualisieren die neue `bakedown.py` über die alte installieren und Blender neu starten.
-
-## Arbeitsablauf
-
-Statisches Objekt (Gebäude, Requisite):
-
-```text
-Vereinfachen → Backen → (LOD) → Exportieren
-```
-
-Charakter:
-
-```text
-Vereinfachen → Backen → Rig → LOD → Exportieren
-```
-
-LODs **nach** dem Rig erzeugen, damit sie das Skelett übernehmen. Sind mehrere Objekte ausgewählt, bearbeitet BakeDown nur das aktive Mesh (das mit dem helleren Umriss).
-
-## Funktionen
-
-### Vereinfachung
-- Ziel nach echter Dreiecksanzahl (Regler + Voreinstellungen 1K/3K/5K/10K/20K) oder nach ungefährem Verzerrungsbudget (eine binäre Suche ermittelt die Dreiecksanzahl).
-- Verschweißen, Bereinigen loser Geometrie, Normalen-Korrektur (inklusive Custom Split Normals von KI-Meshes), Limited Dissolve und Collapse-Decimate; optional Löcher füllen, Innenflächen entfernen, Flächen begradigen und explizit triangulieren.
-- Verzerrungsschätzung in Millimetern und % der Objektgröße direkt im Panel.
-- Prüfansicht **Form** (Solid + MatCap + Drahtgitter) und **Vergleichen** Original ↔ Ergebnis.
-
-### Textur-Baking
-- Cycles-Baking von Base Color, Roughness, Metallic und optional einer Tangent-Space-Normal-Map auf ein neues UV-Layout, in 1K/2K/4K.
-- Modal, mit Fortschritt und Abbruch; vollständiges Zurückrollen bei Abbruch oder Fehler.
-- Automatische Strahldistanz, Live-Normal-Stärke, Schärfen der Base Color.
-
-### LOD
-- LOD0–LOD3 mit den Voreinstellungen Strategie, 3D-Shooter, Mobil und Eigene. Alle LODs teilen sich einen Textursatz.
-- Skelett-bewusst: LODs eines geriggten Meshes übernehmen Skelett und Gewichte.
-- Benennung `<Objekt>_LOD0..3`, sodass Unity automatisch eine LOD Group erstellt.
-- Warnt, wenn LODs nach erneutem Vereinfachen oder Backen veraltet sind, und verweigert deren Export.
-
-### Rig-Übertragung
-- Ein geskinntes FBX als Vorlage importieren und Skelett und Vertex-Gewichte auf das aktive Mesh übertragen (für ähnliche Humanoide).
-- Arbeitet in der Rest Position und stellt den Posen-Zustand auch nach einem Fehler wieder her.
-
-### Export
-- FBX für Unity, FBX für Unreal (Smoothing Groups) und eigenständiges GLB.
-- Modell und PNG-Texturen landen in einem Unterordner mit dem Namen der .blend-Datei; das FBX verweist mit relativen Pfaden auf die PNGs.
-- Optionen: Grünkanal der Normal Map invertieren (DirectX-Konvention), ORM packen.
-- Exportiert ein einzelnes Objekt oder seine gesamte LOD-Collection (mit Skelett) als eine Datei.
+- **Vereinfachen** — Ziel in echten Dreiecken oder als Verzerrungsbudget, Bereinigung von KI-Meshes und Scans, Limited Dissolve, Collapse; optional Löcher füllen, Innenflächen entfernen, begradigen, triangulieren. Nur das aktive Mesh wird verändert.
+- **Backen** — Cycles-Baking von Base Color, Roughness, Metallic und Tangent-Normal auf ein neues UV-Layout in 1K/2K/4K; automatische Strahldistanz, Live-Normal-Stärke, Schärfen; Fortschritt, Abbruch mit Esc, vollständiger Rollback.
+- **LOD** — LOD0–LOD3 mit den Presets Strategie / 3D-Shooter / Mobil / Eigene, ein gemeinsamer Textursatz, Skelett-bewusst, Benennung `_LOD0…3` für Unity-LOD-Groups.
+- **Rig-Übertragung** — geskinnte FBX-Vorlage importieren und Skelett samt Gewichten auf das aktive Mesh übertragen.
+- **Export** — FBX für Unity, FBX für Unreal, eigenständiges GLB; PNG-Maps neben dem Modell, ORM-Packing, DirectX-Normalen für Unreal.
+- **Prüfen** — Form-Modus (MatCap + Drahtgitter) und Vergleichen Original ↔ Ergebnis.
 
 ## Nutzung mit KI-Agenten
 
-KI-Agenten (Claude, ChatGPT, Codex, Blender MCP…) können BakeDown steuern, statt eigenen Blender-Code zu schreiben. In den Tests des Autors lieferte ein Agent über BakeDown deutlich bessere Assets als derselbe Agent mit selbst improvisierten Decimate- und Bake-Skripten.
-
-Zwei Einstiegspunkte, beide liefern einen JSON-Bericht (Dreiecke, Verzerrung, gebackene Maps, LODs, exportierte Dateien):
+KI-Agenten (Claude, ChatGPT, Codex, Blender MCP…) können BakeDown steuern, statt eigenen Blender-Code zu improvisieren – in den Tests des Autors lieferte das deutlich bessere Assets. Beide Einstiegspunkte liefern einen JSON-Bericht (Dreiecke, Verzerrung, gebackene Maps, LODs, exportierte Dateien):
 
 ```bash
 blender -b --factory-startup --python tools/bakedown_cli.py -- model.glb --out ./out --triangles 3000 --resolution 2048 --engine unity
@@ -95,34 +78,20 @@ import bakedown
 report = bakedown.process(obj, triangles=3000, resolution=2048, export_dir="/tmp/out", engine="UNITY")
 ```
 
-Vollständige Anleitung für Agenten: [AGENTS.md](AGENTS.md) (Englisch).
+Anleitung für Agenten: [AGENTS.md](AGENTS.md) (Englisch).
 
 ## Sprachen der Oberfläche
 
-Die Originalsprache der Oberfläche ist Englisch. Übersetzungen für **Russisch, Spanisch, Deutsch und vereinfachtes Chinesisch** sind enthalten; Blender zeigt sie automatisch passend zur Oberflächensprache an (**Preferences → Interface → Translation**).
+Englisch, Russisch, Spanisch, Deutsch und vereinfachtes Chinesisch – Blender wechselt automatisch über **Preferences → Interface → Translation**.
 
-## Tipps
+## FAQ
 
-- Gebacken wird mit Cycles auf der CPU: in 4K zwischen einigen Dutzend Sekunden und ein paar Minuten pro Objekt.
-- Schwarze Flecken nach dem Backen → **Strahldistanz** erhöhen; verschmierte feine Details → wieder auf 0 (auto) setzen.
-- Triangulierung ist standardmäßig aus: Engines triangulieren beim Import, die GPU-Last ist gleich.
-- Für Mixamo-Animationen: einmal riggen; Animationen sind separate FBX-Dateien, die in Unity per Humanoid Avatar retargetet werden.
+Dreiecksziele, Verzerrung, schwarze Flecken nach dem Backen, geriggte Charaktere, Besonderheiten von Unity und Unreal sowie Einschränkungen: [docs/FAQ.md](docs/FAQ.md) (Englisch).
 
-## Einschränkungen
+## Mitwirken
 
-- Die Verzerrung ist eine ungefähre, abgetastete Metrik, keine exakte Hausdorff-Distanz.
-- Ein laufender Backdurchgang lässt sich nicht unterbrechen; der Abbruch greift zwischen den Maps.
-- Die Innenflächen-Erkennung ist experimentell und standardmäßig aus.
-- Ungewöhnliche negative oder ungleichmäßige Skalierungen vor dem Engine-Import prüfen.
-
-## Entwicklung
-
-Architektur und Stolperfallen stehen in [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) (Englisch), der Teststatus in [docs/VERIFICATION.md](docs/VERIFICATION.md). Tests ohne Oberfläche:
-
-```bash
-/Applications/Blender.app/Contents/MacOS/Blender -b --factory-startup --python-exit-code 1 --python tests/run_tests.py
-```
+Fehlerberichte und Ideen sind willkommen – [Issue anlegen](https://github.com/keeraa/bakedown/issues/new/choose). Für Entwickler: [CONTRIBUTING.md](CONTRIBUTING.md), [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md), [docs/VERIFICATION.md](docs/VERIFICATION.md), [CHANGELOG.md](CHANGELOG.md).
 
 ## Lizenz
 
-GNU General Public License v3.0 oder später. Siehe [LICENSE](LICENSE).
+GPL-3.0-or-later © Kirill Migachev. Siehe [LICENSE](LICENSE).
