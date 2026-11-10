@@ -1,5 +1,18 @@
 # Changelog
 
+## 1.4.0 — 2026-11-10
+
+### Added
+
+- **Python API** for scripts and AI agents: `bakedown.process()`, `simplify()`, `bake()`, `generate_lods()`, `export()`, `report()`. One mesh per call, JSON-friendly results, `BakeDownError` with readable messages, scene settings restored after each call.
+- **Command-line tool** `tools/bakedown_cli.py`: model file in (`.glb .gltf .fbx .obj .ply .stl .blend`), game-ready export + `bakedown_report.json` out, runs without a window.
+- **AGENTS.md** — instructions for AI agents (CLI, Blender MCP / Python API, recommended values, what not to do).
+- The bake operator can run blocking (`EXEC_DEFAULT`) in background mode; the interactive panel still uses the modal bake with progress and Esc.
+
+### Changed
+
+- Description and READMEs: BakeDown works with any heavy mesh — AI-generated, scanned, sculpted or downloaded.
+
 ## 1.3.0 — 2026-11-10
 
 ### Changed

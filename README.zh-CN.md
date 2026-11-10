@@ -2,9 +2,11 @@
 
 [English](README.md) · [Русский](README.ru.md) · [Español](README.es.md) · [Deutsch](README.de.md) · **简体中文**
 
-**版本 1.3.0 · Blender 4.5+ · GPL-3.0-or-later**
+**版本 1.4.0 · Blender 4.5+ · GPL-3.0-or-later**
 
 BakeDown 是一款 Blender 插件，可将 AI 生成和摄影测量得到的高面数网格（Hunyuan、Meshy、Tripo、Rodin、扫描模型——通常 5 万面以上并带一张 4K 纹理）转换为**可直接用于游戏的资产**。它只简化活动网格，把原始模型的 PBR 纹理烘焙到轻量网格上，生成 LOD，迁移骨骼绑定，并导出到 Unity、Unreal Engine 或 glTF。
+
+它适用于**任何高面数网格**，不仅限于 AI 生成的模型：3D 扫描、雕刻模型、素材商店或拼装（kitbash）的高模，以及转换后的 CAD 模型。
 
 整个流程是**非破坏性**的：原始模型保存为备份，可以随意尝试不同参数，**重置**即可恢复原状。
 
@@ -77,6 +79,23 @@ BakeDown 是一款 Blender 插件，可将 AI 生成和摄影测量得到的高�
 - 模型和 PNG 纹理保存在以 .blend 文件命名的子文件夹中；FBX 以相对路径引用 PNG。
 - 选项：翻转法线贴图绿色通道（DirectX 约定）、打包 ORM。
 - 可导出单个物体，或将其整个 LOD 集合（连同骨架）导出为一个文件。
+
+## 配合 AI 智能体使用
+
+AI 智能体（Claude、ChatGPT、Codex、Blender MCP 等）可以直接调用 BakeDown，而不必自己编写 Blender 代码。在作者的测试中，通过 BakeDown 工作的智能体产出的资产明显优于同一智能体自行编写简化和烘焙脚本的结果。
+
+两种接入方式，都会返回 JSON 报告（三角面数、形变、烘焙贴图、LOD、导出文件）：
+
+```bash
+blender -b --factory-startup --python tools/bakedown_cli.py -- model.glb --out ./out --triangles 3000 --resolution 2048 --engine unity
+```
+
+```python
+import bakedown
+report = bakedown.process(obj, triangles=3000, resolution=2048, export_dir="/tmp/out", engine="UNITY")
+```
+
+智能体完整说明：[AGENTS.md](AGENTS.md)（英文）。
 
 ## 界面语言
 

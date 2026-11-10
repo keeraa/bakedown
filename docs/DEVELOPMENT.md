@@ -7,7 +7,7 @@ Read this before changing the add-on. Section 3 lists hard-won pitfalls.
 
 ---
 
-## 0. Architecture changes in 1.2–1.3
+## 0. Architecture changes in 1.2–1.4
 
 - All geometry processing is bound to `context.active_object`; `_activate_only()` deselects every other object before `bpy.ops` calls.
 - Geometry statistics go through `_triangle_count_mesh()` / `_triangle_count_object()` and count `mesh.loop_triangles`, not `mesh.polygons`.
@@ -21,6 +21,8 @@ Read this before changing the add-on. Section 3 lists hard-won pitfalls.
 - **1.3.0:** `_fbx_export_kwargs(engine, path, has_armature)` holds the per-engine FBX settings (Unity: `FBX_SCALE_ALL`, `-Z` forward / `Y` up, `bake_space_transform` only without an armature).
 - **1.3.0:** distortion sampling and BVH construction use numpy (`_world_array`, up to 8,000 samples per direction).
 - **1.3.0:** `_tr()` translates in the `BakeDown` context (`_I18N_CTX`); every translation is registered in both the default and the BakeDown context.
+- **1.4.0:** the bake operator is split into `_prepare()` + `invoke()` (modal, interactive) + `execute()` (blocking, for scripts / background mode).
+- **1.4.0:** public Python API at the end of the module (`process`, `simplify`, `bake`, `generate_lods`, `export`, `report`, `BakeDownError`, `API_VERSION`). It drives the operators with `EXEC_DEFAULT` and restores `scene.bakedown` through `_SceneSettings`. `tools/bakedown_cli.py` wraps it for files on disk. Keep `AGENTS.md` in sync when the API changes, and bump `API_VERSION` on breaking changes.
 - UI source strings are English; translations are registered with `bpy.app.translations` (see section 6).
 
 ## 1. Architecture
@@ -135,7 +137,7 @@ Automated tests run headless in real Blender:
 /Applications/Blender.app/Contents/MacOS/Blender -b --factory-startup --python-exit-code 1 --python tests/run_tests.py
 ```
 
-They cover registration, active-object isolation, LOD export, stale-LOD detection, the stale bake flag, comparison-object gating, sharpening, rig weights in LODs, distortion mode and translation completeness. See `docs/VERIFICATION.md` for what still needs a manual desktop check (a real Cycles bake and Esc cancellation cannot run in background mode).
+They cover the Python API and the command-line tool, registration, active-object isolation, LOD export, stale-LOD detection, the stale bake flag, comparison-object gating, sharpening, rig weights in LODs, distortion mode and translation completeness. See `docs/VERIFICATION.md` for what still needs a manual desktop check (a real Cycles bake and Esc cancellation cannot run in background mode).
 
 ---
 

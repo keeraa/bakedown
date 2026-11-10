@@ -2,9 +2,11 @@
 
 **English** · [Русский](README.ru.md) · [Español](README.es.md) · [Deutsch](README.de.md) · [简体中文](README.zh-CN.md)
 
-**Version 1.3.0 · Blender 4.5+ · GPL-3.0-or-later**
+**Version 1.4.0 · Blender 4.5+ · GPL-3.0-or-later**
 
 BakeDown is a Blender add-on that turns heavy AI-generated and photogrammetry meshes (Hunyuan, Meshy, Tripo, Rodin, scans — often 50k+ polygons with a single 4K texture) into **game-ready assets**. It simplifies only the active mesh, bakes PBR textures from the original onto the light mesh, generates LODs, transfers rigs, and exports to Unity, Unreal Engine or glTF.
+
+It works with **any heavy mesh**, not only AI output: 3D scans, sculpts, high-poly marketplace or kitbash models, CAD conversions.
 
 The workflow is **non-destructive**: the original is kept as a backup, you can try different values freely, and **Reset** brings everything back.
 
@@ -77,6 +79,23 @@ Generate LODs **after** the rig so they inherit the armature. When several objec
 - Model and PNG textures go into a sub-folder named after the .blend file; FBX references the PNGs with relative paths.
 - Options: normal-map green-channel flip (DirectX convention), ORM packing.
 - Exports a single object or its whole LOD collection (with the armature) as one file.
+
+## Use with AI agents
+
+AI agents (Claude, ChatGPT, Codex, Blender MCP…) can drive BakeDown instead of writing their own Blender code. In the author's tests an agent working through BakeDown produced noticeably better assets than the same agent improvising decimation and baking scripts.
+
+Two entry points, both return a JSON report (triangles, distortion, baked maps, LODs, exported files):
+
+```bash
+blender -b --factory-startup --python tools/bakedown_cli.py -- model.glb --out ./out --triangles 3000 --resolution 2048 --engine unity
+```
+
+```python
+import bakedown
+report = bakedown.process(obj, triangles=3000, resolution=2048, export_dir="/tmp/out", engine="UNITY")
+```
+
+Full instructions for agents: [AGENTS.md](AGENTS.md).
 
 ## Interface languages
 

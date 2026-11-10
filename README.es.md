@@ -2,9 +2,11 @@
 
 [English](README.md) · [Русский](README.ru.md) · **Español** · [Deutsch](README.de.md) · [简体中文](README.zh-CN.md)
 
-**Versión 1.3.0 · Blender 4.5+ · GPL-3.0-or-later**
+**Versión 1.4.0 · Blender 4.5+ · GPL-3.0-or-later**
 
 BakeDown es un complemento de Blender que convierte mallas pesadas generadas por IA o por fotogrametría (Hunyuan, Meshy, Tripo, Rodin, escaneos — a menudo 50k+ polígonos con una sola textura 4K) en **assets listos para juegos**. Simplifica solo la malla activa, hornea texturas PBR del original sobre la malla ligera, genera LOD, transfiere rigs y exporta a Unity, Unreal Engine o glTF.
+
+Funciona con **cualquier malla pesada**, no solo con resultados de IA: escaneos 3D, esculturas, modelos high-poly de tiendas o kitbash y conversiones de CAD.
 
 El flujo es **no destructivo**: el original se guarda como copia de seguridad, puedes probar valores libremente y **Restablecer** lo devuelve todo a su estado.
 
@@ -77,6 +79,23 @@ Genera los LOD **después** del rig para que hereden el esqueleto. Si hay varios
 - El modelo y las texturas PNG se guardan en una subcarpeta con el nombre del archivo .blend; el FBX referencia los PNG con rutas relativas.
 - Opciones: inversión del canal verde del mapa de normales (convención DirectX), empaquetado ORM.
 - Exporta un objeto o toda su colección de LOD (con el esqueleto) en un solo archivo.
+
+## Uso con agentes de IA
+
+Los agentes de IA (Claude, ChatGPT, Codex, Blender MCP…) pueden manejar BakeDown en lugar de escribir su propio código para Blender. En las pruebas del autor, un agente que trabajaba con BakeDown obtuvo assets claramente mejores que el mismo agente improvisando scripts de diezmado y horneado.
+
+Dos puntos de entrada; ambos devuelven un informe JSON (triángulos, distorsión, mapas horneados, LOD, archivos exportados):
+
+```bash
+blender -b --factory-startup --python tools/bakedown_cli.py -- model.glb --out ./out --triangles 3000 --resolution 2048 --engine unity
+```
+
+```python
+import bakedown
+report = bakedown.process(obj, triangles=3000, resolution=2048, export_dir="/tmp/out", engine="UNITY")
+```
+
+Instrucciones completas para agentes: [AGENTS.md](AGENTS.md) (en inglés).
 
 ## Idiomas de la interfaz
 

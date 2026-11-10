@@ -3,11 +3,11 @@
 bl_info = {
     "name": "BakeDown — Game Asset Optimizer",
     "author": "Kirill Migachev",
-    "version": (1, 3, 0),
+    "version": (1, 4, 0),
     "blender": (4, 5, 0),
     "location": "View3D > Sidebar > BakeDown",
-    "description": ("Turn AI-generated and photogrammetry meshes into game-ready assets: "
-                    "active-object-only simplification, texture baking, LODs, rig transfer, "
+    "description": ("Turn heavy meshes — AI-generated, scanned, sculpted or downloaded — into "
+                    "game-ready assets: simplification, texture baking, LODs, rig transfer, "
                     "and Unity/Unreal/glTF export."),
     "category": "Mesh",
 }
@@ -26,7 +26,7 @@ _I18N_CTX = "BakeDown"
 _TRANSLATIONS = {
     "ru_RU": {
         ("*", "BakeDown — Game Asset Optimizer"): "BakeDown — оптимизация игровых моделей",
-        ("*", "Turn AI-generated and photogrammetry meshes into game-ready assets: active-object-only simplification, texture baking, LODs, rig transfer, and Unity/Unreal/glTF export."): "Преобразует AI- и фотограмметрические меши в игровые ассеты: упрощение только активного объекта, запекание текстур, LOD, перенос рига и экспорт в Unity/Unreal/glTF.",
+        ("*", "Turn heavy meshes — AI-generated, scanned, sculpted or downloaded — into game-ready assets: simplification, texture baking, LODs, rig transfer, and Unity/Unreal/glTF export."): "Превращает тяжёлые меши — из нейросетей, сканов, скульпта или скачанные — в игровые ассеты: упрощение, запекание текстур, LOD, перенос рига и экспорт в Unity/Unreal/glTF.",
         ("*", "Target triangles"): "Целевые треугольники",
         ("*", "How many real render triangles to keep after simplification. Game guidelines: hero prop 10–20k, building 3–8k, small prop 0.5–2k, distant background 0.1–0.5k."): "Сколько реальных треугольников рендера оставить после упрощения. Ориентиры: hero-объект 10–20k, здание 3–8k, мелкий декор 0.5–2k, дальний фон 0.1–0.5k.",
         ("*", "Target mode"): "Режим цели",
@@ -197,7 +197,7 @@ _TRANSLATIONS["ru_RU"].update({
 # Spanish ---------------------------------------------------------------------
 _ES = {
     "BakeDown — Game Asset Optimizer": "BakeDown — optimizador de assets para juegos",
-    "Turn AI-generated and photogrammetry meshes into game-ready assets: active-object-only simplification, texture baking, LODs, rig transfer, and Unity/Unreal/glTF export.": "Convierte mallas generadas por IA y de fotogrametría en assets listos para juegos: simplificación solo del objeto activo, horneado de texturas, LOD, transferencia de rig y exportación a Unity/Unreal/glTF.",
+    "Turn heavy meshes — AI-generated, scanned, sculpted or downloaded — into game-ready assets: simplification, texture baking, LODs, rig transfer, and Unity/Unreal/glTF export.": "Convierte mallas pesadas —generadas por IA, escaneadas, esculpidas o descargadas— en assets listos para juegos: simplificación, horneado de texturas, LOD, transferencia de rig y exportación a Unity/Unreal/glTF.",
     "Target triangles": "Triángulos objetivo",
     "How many real render triangles to keep after simplification. Game guidelines: hero prop 10–20k, building 3–8k, small prop 0.5–2k, distant background 0.1–0.5k.": "Cuántos triángulos reales de render conservar tras la simplificación. Referencias: objeto principal 10–20k, edificio 3–8k, objeto pequeño 0.5–2k, fondo lejano 0.1–0.5k.",
     "Target mode": "Modo de objetivo",
@@ -359,7 +359,7 @@ _ES = {
 # German ----------------------------------------------------------------------
 _DE = {
     "BakeDown — Game Asset Optimizer": "BakeDown — Game-Asset-Optimierer",
-    "Turn AI-generated and photogrammetry meshes into game-ready assets: active-object-only simplification, texture baking, LODs, rig transfer, and Unity/Unreal/glTF export.": "Macht KI-generierte und Photogrammetrie-Meshes spielfertig: Vereinfachung nur des aktiven Objekts, Textur-Baking, LODs, Rig-Übertragung und Export nach Unity/Unreal/glTF.",
+    "Turn heavy meshes — AI-generated, scanned, sculpted or downloaded — into game-ready assets: simplification, texture baking, LODs, rig transfer, and Unity/Unreal/glTF export.": "Macht schwere Meshes – KI-generiert, gescannt, gesculptet oder heruntergeladen – spielfertig: Vereinfachung, Textur-Baking, LODs, Rig-Übertragung und Export nach Unity/Unreal/glTF.",
     "Target triangles": "Ziel-Dreiecke",
     "How many real render triangles to keep after simplification. Game guidelines: hero prop 10–20k, building 3–8k, small prop 0.5–2k, distant background 0.1–0.5k.": "Wie viele echte Render-Dreiecke nach der Vereinfachung bleiben. Richtwerte: Hero-Objekt 10–20k, Gebäude 3–8k, kleines Objekt 0.5–2k, ferner Hintergrund 0.1–0.5k.",
     "Target mode": "Zielmodus",
@@ -521,7 +521,7 @@ _DE = {
 # Simplified Chinese ----------------------------------------------------------
 _ZH = {
     "BakeDown — Game Asset Optimizer": "BakeDown — 游戏资产优化器",
-    "Turn AI-generated and photogrammetry meshes into game-ready assets: active-object-only simplification, texture baking, LODs, rig transfer, and Unity/Unreal/glTF export.": "将 AI 生成和摄影测量网格转换为可用于游戏的资产：仅简化活动物体、烘焙纹理、生成 LOD、迁移骨骼绑定，并导出到 Unity/Unreal/glTF。",
+    "Turn heavy meshes — AI-generated, scanned, sculpted or downloaded — into game-ready assets: simplification, texture baking, LODs, rig transfer, and Unity/Unreal/glTF export.": "将高面数网格（AI 生成、扫描、雕刻或下载的模型）转换为可用于游戏的资产：简化、烘焙纹理、生成 LOD、迁移骨骼绑定，并导出到 Unity/Unreal/glTF。",
     "Target triangles": "目标三角面数",
     "How many real render triangles to keep after simplification. Game guidelines: hero prop 10–20k, building 3–8k, small prop 0.5–2k, distant background 0.1–0.5k.": "简化后保留的实际渲染三角面数。参考：主角道具 10–20k，建筑 3–8k，小道具 0.5–2k，远景 0.1–0.5k。",
     "Target mode": "目标模式",
@@ -1825,8 +1825,8 @@ class OBJECT_OT_bakedown_bake(bpy.types.Operator):
     def poll(cls, context):
         return _not_lod(context)
 
-    def invoke(self, context, event):
-        global _BAKE_RUNNING
+    def _prepare(self, context):
+        """Set up the transactional bake. Returns None when ready, else an operator result."""
         pg = context.scene.bakedown
         lo = context.active_object
         if lo is None or lo.type != 'MESH':
@@ -1968,17 +1968,49 @@ class OBJECT_OT_bakedown_bake(bpy.types.Operator):
             pg.bake_progress = 0.0
             pg.bake_stage = _tr("Preparing")
             _redraw_ui(context)
-
-            wm = context.window_manager
-            self._timer = wm.event_timer_add(0.05, window=context.window)
-            if not wm.modal_handler_add(self):
-                raise RuntimeError("Could not start the modal bake handler")
-            _BAKE_RUNNING = True
-            return {'RUNNING_MODAL'}
+            return None
         except Exception as exc:
             self.report({'ERROR'}, _tr("Bake failed: {}").format(exc))
             self._cleanup(context, cancelled=True)
             return {'CANCELLED'}
+
+    def invoke(self, context, event):
+        """Interactive bake: modal, with progress and Esc / Cancel."""
+        global _BAKE_RUNNING
+        early = self._prepare(context)
+        if early is not None:
+            return early
+        try:
+            wm = context.window_manager
+            self._timer = wm.event_timer_add(0.05, window=context.window)
+            if not wm.modal_handler_add(self):
+                raise RuntimeError("Could not start the modal bake handler")
+        except Exception as exc:
+            self.report({'ERROR'}, _tr("Bake failed: {}").format(exc))
+            self._cleanup(context, cancelled=True)
+            return {'CANCELLED'}
+        _BAKE_RUNNING = True
+        return {'RUNNING_MODAL'}
+
+    def execute(self, context):
+        """Blocking bake for scripts, the command-line tool and AI agents."""
+        global _BAKE_RUNNING
+        early = self._prepare(context)
+        if early is not None:
+            return early
+        _BAKE_RUNNING = True
+        pg = context.scene.bakedown
+        for index, (stage, fn) in enumerate(self._passes):
+            pg.bake_stage = stage
+            try:
+                fn(context)
+            except Exception as exc:
+                self.report({'ERROR'}, _tr("Bake failed: {}").format(exc))
+                self._cleanup(context, cancelled=True)
+                return {'CANCELLED'}
+            pg.bake_progress = (index + 1) / len(self._passes)
+        self._cleanup(context, cancelled=False)
+        return {'FINISHED'} if self._committed else {'CANCELLED'}
 
     def _do_bake(self, context, node, btype, **kw):
         for n in self.nt.nodes:
@@ -3068,6 +3100,226 @@ class VIEW3D_PT_bakedown(bpy.types.Panel):
             dl = r.row(align=True); dl.enabled = active_result; dl.alert = True
             dl.operator('object.bakedown_finalize', text="", icon='TRASH')
             r.operator('object.bakedown_export', text=_tr("Export"), icon='EXPORT')
+
+
+# ---------------------------------------------------------------------------
+# Python API — scripts, batch processing and AI agents
+#
+#     import bakedown
+#     report = bakedown.process(bpy.data.objects["Statue"], triangles=3000,
+#                               resolution=2048, export_dir="/tmp/out", engine='UNITY')
+#
+# Every function works on one mesh object, never touches other objects, raises
+# BakeDownError with a readable message on failure and returns plain dicts that
+# can be printed as JSON. See AGENTS.md.
+# ---------------------------------------------------------------------------
+API_VERSION = 1
+
+
+class BakeDownError(RuntimeError):
+    """Raised by the BakeDown API when an operation cannot be completed."""
+
+
+_SIMPLIFY_OPTIONS = ("dissolve_angle", "do_dissolve_faces", "final_dissolve", "fill_holes",
+                     "remove_interior", "planar_snap", "triangulate_output")
+_ENGINES = {"UNITY": "UNITY", "UNREAL": "UNREAL", "GLTF": "GLTF", "GLB": "GLTF"}
+
+
+class _SceneSettings:
+    """Temporarily set scene.bakedown values and restore them afterwards."""
+
+    def __init__(self, scene, **values):
+        self.pg = scene.bakedown
+        self.values = {k: v for k, v in values.items() if v is not None}
+        self.saved = {}
+
+    def __enter__(self):
+        global _lod_syncing
+        _lod_syncing = True          # keep LOD presets from overwriting explicit values
+        try:
+            for key, value in self.values.items():
+                self.saved[key] = getattr(self.pg, key)
+                setattr(self.pg, key, value)
+        finally:
+            _lod_syncing = False
+        return self.pg
+
+    def __exit__(self, *exc):
+        global _lod_syncing
+        _lod_syncing = True
+        try:
+            for key, value in self.saved.items():
+                try:
+                    setattr(self.pg, key, value)
+                except Exception:
+                    pass
+        finally:
+            _lod_syncing = False
+        return False
+
+
+def _api_object(obj):
+    if isinstance(obj, str):
+        found = bpy.data.objects.get(obj)
+        if found is None:
+            raise BakeDownError(f"Object not found: {obj!r}")
+        obj = found
+    if obj is None or getattr(obj, "type", None) != 'MESH':
+        raise BakeDownError("A mesh object is required")
+    return obj
+
+
+def _api_activate(obj):
+    context = bpy.context
+    if obj.name not in context.view_layer.objects:
+        raise BakeDownError(f"{obj.name!r} is not in the current view layer")
+    if context.mode != 'OBJECT' and context.view_layer.objects.active is not None:
+        bpy.ops.object.mode_set(mode='OBJECT')
+    obj.hide_set(False)
+    for other in context.view_layer.objects:
+        other.select_set(other == obj)
+    context.view_layer.objects.active = obj
+
+
+def _api_call(operator, **kwargs):
+    try:
+        result = operator('EXEC_DEFAULT', **kwargs)
+    except RuntimeError as exc:
+        raise BakeDownError(str(exc).replace("Error: ", "").strip()) from None
+    if 'FINISHED' not in result:
+        raise BakeDownError(f"{operator.idname_py()} returned {sorted(result)}")
+
+
+def report(obj):
+    """Current BakeDown state of a mesh object as a JSON-friendly dict."""
+    obj = _api_object(obj)
+    base = _base_object(obj) or obj
+    backup = _get_backup(base)
+    coll = bpy.data.collections.get(f"{base.name}_LODs")
+    lods = ([ob for ob in coll.objects if ob.get("bakedown_lod_of") == base.name]
+            if coll is not None else [])
+    images = {}
+    for suffix in ("BaseColor", "Rough", "Metal", "Normal"):
+        image = _baked_image(base, suffix)
+        if image is not None:
+            images[suffix] = image.name
+    return {
+        "api_version": API_VERSION,
+        "addon_version": ".".join(str(n) for n in bl_info["version"]),
+        "object": obj.name,
+        "base_object": base.name,
+        "triangles": _triangle_count_object(base),
+        "original_triangles": _triangle_count_mesh(backup) if backup is not None else None,
+        "simplified": bool(base.get("bakedown_simplified")),
+        "distortion_mm": base.get("bakedown_distort_mm"),
+        "distortion_pct": base.get("bakedown_distort_pct"),
+        "baked": bool(base.get("bakedown_baked_sig")) and _bake_assets_exist(base, bpy.context.scene.bakedown),
+        "material": base.get("bakedown_material_name"),
+        "images": images,
+        "lods": [{"name": ob.name, "level": ob.get("bakedown_lod_level"),
+                  "triangles": _triangle_count_object(ob),
+                  "distortion_pct": ob.get("bakedown_distort_pct")}
+                 for ob in sorted(lods, key=lambda o: o.get("bakedown_lod_level", ""))],
+        "lod_state": _lod_state(base, lods) if lods else None,
+    }
+
+
+def simplify(obj, triangles=None, distortion=None, **options):
+    """Simplify one mesh. Give `triangles` (target count) or `distortion` (budget in %
+    of object size). Extra options: dissolve_angle, do_dissolve_faces, final_dissolve,
+    fill_holes, remove_interior, planar_snap, triangulate_output."""
+    obj = _api_object(obj)
+    if (triangles is None) == (distortion is None):
+        raise BakeDownError("Pass exactly one of triangles= or distortion=")
+    unknown = set(options) - set(_SIMPLIFY_OPTIONS)
+    if unknown:
+        raise BakeDownError(f"Unknown simplify options: {sorted(unknown)}")
+    settings = dict(options)
+    if triangles is not None:
+        settings.update(target_mode='FACES', target_faces=int(triangles))
+    else:
+        settings.update(target_mode='DISTORTION', target_distortion=float(distortion))
+    _api_activate(obj)
+    with _SceneSettings(bpy.context.scene, **settings):
+        _api_call(bpy.ops.object.bakedown_decimate)
+    return report(obj)
+
+
+def bake(obj, resolution=2048, normal_map=True, normal_strength=0.5,
+         sharpen=0.0, ray_distance=0.0):
+    """Bake Base Color, Roughness, Metallic (and Normal) from the original onto the
+    simplified mesh. Blocking; uses Cycles on the CPU."""
+    obj = _api_object(obj)
+    if _get_backup(obj) is None:
+        raise BakeDownError("Run simplify() before bake()")
+    if int(resolution) not in (1024, 2048, 4096):
+        raise BakeDownError("resolution must be 1024, 2048 or 4096")
+    _api_activate(obj)
+    with _SceneSettings(bpy.context.scene, bake_resolution=str(int(resolution)),
+                        bake_normal=bool(normal_map), bake_normal_strength=float(normal_strength),
+                        bake_sharpen=float(sharpen), bake_extrusion=float(ray_distance)):
+        _api_call(bpy.ops.object.bakedown_bake)
+    return report(obj)
+
+
+def generate_lods(obj, lod1=50.0, lod2=25.0, lod3=10.0):
+    """Generate LOD0–LOD3 (percent of LOD0 triangles; None skips a level)."""
+    obj = _api_object(obj)
+    base = _base_object(obj) or obj
+    if not base.get("bakedown_simplified"):
+        raise BakeDownError("Run simplify() before generate_lods()")
+    _api_activate(base)
+    with _SceneSettings(bpy.context.scene,
+                        lod1_on=lod1 is not None, lod2_on=lod2 is not None, lod3_on=lod3 is not None,
+                        lod1_pct=lod1, lod2_pct=lod2, lod3_pct=lod3):
+        _api_call(bpy.ops.object.bakedown_lod)
+    return report(base)
+
+
+def export(obj, directory, engine='UNITY', textures=True, flip_normal_green=False, pack_orm=False):
+    """Export the object (or its LOD collection) for 'UNITY', 'UNREAL' or 'GLTF'.
+    Returns the report plus `export_dir` and the list of written `files`."""
+    obj = _api_object(obj)
+    engine_id = _ENGINES.get(str(engine).upper())
+    if engine_id is None:
+        raise BakeDownError("engine must be 'UNITY', 'UNREAL' or 'GLTF'")
+    directory = os.path.abspath(bpy.path.abspath(directory))
+    os.makedirs(directory, exist_ok=True)
+    base = _base_object(obj) or obj
+    coll = bpy.data.collections.get(f"{base.name}_LODs")
+    target = (next((ob for ob in coll.objects if ob.get("bakedown_lod_level") == 'LOD0'), None)
+              if coll is not None else None) or base
+    _api_activate(target)
+    _api_call(bpy.ops.object.bakedown_export, directory=directory, target_engine=engine_id,
+              save_textures=bool(textures), flip_normal_green=bool(flip_normal_green),
+              pack_orm=bool(pack_orm))
+    # Same folder rule as the export operator: <directory>/<.blend name or object name>/
+    folder = (os.path.splitext(os.path.basename(bpy.data.filepath))[0]
+              if bpy.data.filepath else base.name)
+    out_dir = os.path.join(directory, _safe_name(folder))
+    result = report(base)
+    result["export_dir"] = out_dir
+    result["files"] = sorted(os.path.join(out_dir, f) for f in os.listdir(out_dir)
+                             if not f.startswith("."))
+    return result
+
+
+def process(obj, triangles=None, distortion=None, resolution=2048, normal_map=True,
+            lods=None, export_dir=None, engine='UNITY', **simplify_options):
+    """Full pipeline in one call: simplify → bake → optional LODs → optional export.
+    `lods` is None (skip) or a (lod1, lod2, lod3) tuple of percentages."""
+    obj = _api_object(obj)
+    steps = {}
+    steps["simplify"] = simplify(obj, triangles=triangles, distortion=distortion, **simplify_options)
+    if resolution:
+        steps["bake"] = bake(obj, resolution=resolution, normal_map=normal_map)
+    if lods:
+        steps["lods"] = generate_lods(obj, *lods)
+    result = report(obj)
+    if export_dir:
+        result = export(obj, export_dir, engine=engine)
+    result["steps"] = list(steps)
+    return result
 
 
 # ---------------------------------------------------------------------------

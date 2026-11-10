@@ -312,7 +312,7 @@ def ui_strings_use_own_translation_context():
 def distortion_sampling_is_dense_and_fast():
     import time
     fresh()
-    o = sphere("H", 7)          # ~328k triangles
+    o = sphere("H", 7)
     pts = bd._sample_mesh_points(o.data, o.matrix_world)
     assert 7000 <= len(pts) <= 8000
     t = time.perf_counter()
@@ -320,6 +320,69 @@ def distortion_sampling_is_dense_and_fast():
     d = bd._max_distance_to_tree(pts, tree)
     assert d < 1e-4
     assert time.perf_counter() - t < 10.0
+
+
+@test
+def api_full_pipeline_headless():
+    fresh()
+    o = sphere("Api", 5)
+    original = bd._triangle_count_object(o)
+    r = bd.simplify(o, triangles=1500)
+    assert r["simplified"] and r["triangles"] <= 1500 and r["original_triangles"] == original
+    assert r["distortion_pct"] is not None
+    r = bd.bake(o, resolution=1024)                  # blocking bake, no window needed
+    assert r["baked"] and set(r["images"]) == {"BaseColor", "Rough", "Metal", "Normal"}
+    assert bd._BAKE_RUNNING is False and C.scene.bakedown.is_baking is False
+    r = bd.generate_lods(o, 50, 25, None)
+    assert [l["level"] for l in r["lods"]] == ["LOD0", "LOD1", "LOD2"] and r["lod_state"] == "OK"
+    r = bd.export(o, OUT, engine="unity")
+    names = sorted(os.path.basename(f) for f in r["files"])
+    assert "Api.fbx" in names and "Api_BaseColor.png" in names, names
+    # scene settings were restored after each call
+    assert C.scene.bakedown.target_faces == 10000 and C.scene.bakedown.bake_resolution == '4096'
+
+
+@test
+def api_errors_are_readable():
+    fresh()
+    o = sphere("E", 2)
+    for call, needle in ((lambda: bd.bake(o), "simplify"),
+                         (lambda: bd.simplify(o), "exactly one"),
+                         (lambda: bd.simplify("Nope", triangles=10), "not found"),
+                         (lambda: bd.simplify(o, triangles=100, wrong=1), "Unknown"),
+                         (lambda: bd.export(o, OUT, engine="maya"), "engine")):
+        try:
+            call()
+        except bd.BakeDownError as exc:
+            assert needle in str(exc), str(exc)
+        else:
+            raise AssertionError(f"no error for {needle}")
+
+
+@test
+def cli_processes_a_file_and_reports_json():
+    import json, subprocess
+    fresh()
+    o = sphere("CliMesh", 4)
+    src = os.path.join(OUT, "cli_in.glb")
+    make_active(o)
+    bpy.ops.export_scene.gltf(filepath=src, use_selection=True, export_format='GLB')
+    cli = os.path.join(ROOT, "tools", "bakedown_cli.py")
+    out = os.path.join(OUT, "cli_out")
+    run = subprocess.run([bpy.app.binary_path, "-b", "--factory-startup", "--python", cli, "--",
+                          src, "--out", out, "--triangles", "800", "--resolution", "1024",
+                          "--lods", "50,25,10", "--engine", "gltf"],
+                         capture_output=True, text=True, timeout=600)
+    line = [l for l in run.stdout.splitlines() if l.startswith("BAKEDOWN_REPORT ")][-1]
+    rep = json.loads(line.split(" ", 1)[1])
+    assert run.returncode == 0 and rep["ok"], run.stdout[-2000:]
+    assert rep["triangles"] <= 800 and rep["baked"] and len(rep["lods"]) == 4
+    assert any(f.endswith(".glb") for f in rep["files"])
+    assert os.path.exists(os.path.join(rep["export_dir"], "bakedown_report.json"))
+    bad = subprocess.run([bpy.app.binary_path, "-b", "--factory-startup", "--python", cli, "--",
+                          os.path.join(OUT, "missing.glb"), "--out", out, "--triangles", "100"],
+                         capture_output=True, text=True, timeout=300)
+    assert bad.returncode == 1 and '"ok": false' in bad.stdout
 
 
 # ---------------------------------------------------------------------------

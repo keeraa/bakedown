@@ -2,9 +2,11 @@
 
 [English](README.md) · [Русский](README.ru.md) · [Español](README.es.md) · **Deutsch** · [简体中文](README.zh-CN.md)
 
-**Version 1.3.0 · Blender 4.5+ · GPL-3.0-or-later**
+**Version 1.4.0 · Blender 4.5+ · GPL-3.0-or-later**
 
 BakeDown ist ein Blender-Add-on, das schwere KI-generierte und Photogrammetrie-Meshes (Hunyuan, Meshy, Tripo, Rodin, Scans — oft 50k+ Polygone mit einer einzigen 4K-Textur) in **spielfertige Assets** verwandelt. Es vereinfacht nur das aktive Mesh, backt PBR-Texturen vom Original auf das leichte Mesh, erzeugt LODs, überträgt Rigs und exportiert nach Unity, Unreal Engine oder glTF.
+
+Funktioniert mit **jedem schweren Mesh**, nicht nur mit KI-Ergebnissen: 3D-Scans, Sculpts, High-Poly-Modelle aus Marktplätzen oder Kitbash, konvertierte CAD-Daten.
 
 Der Ablauf ist **nicht-destruktiv**: Das Original bleibt als Sicherung erhalten, Werte lassen sich frei ausprobieren, und **Zurücksetzen** stellt alles wieder her.
 
@@ -77,6 +79,23 @@ LODs **nach** dem Rig erzeugen, damit sie das Skelett übernehmen. Sind mehrere 
 - Modell und PNG-Texturen landen in einem Unterordner mit dem Namen der .blend-Datei; das FBX verweist mit relativen Pfaden auf die PNGs.
 - Optionen: Grünkanal der Normal Map invertieren (DirectX-Konvention), ORM packen.
 - Exportiert ein einzelnes Objekt oder seine gesamte LOD-Collection (mit Skelett) als eine Datei.
+
+## Nutzung mit KI-Agenten
+
+KI-Agenten (Claude, ChatGPT, Codex, Blender MCP…) können BakeDown steuern, statt eigenen Blender-Code zu schreiben. In den Tests des Autors lieferte ein Agent über BakeDown deutlich bessere Assets als derselbe Agent mit selbst improvisierten Decimate- und Bake-Skripten.
+
+Zwei Einstiegspunkte, beide liefern einen JSON-Bericht (Dreiecke, Verzerrung, gebackene Maps, LODs, exportierte Dateien):
+
+```bash
+blender -b --factory-startup --python tools/bakedown_cli.py -- model.glb --out ./out --triangles 3000 --resolution 2048 --engine unity
+```
+
+```python
+import bakedown
+report = bakedown.process(obj, triangles=3000, resolution=2048, export_dir="/tmp/out", engine="UNITY")
+```
+
+Vollständige Anleitung für Agenten: [AGENTS.md](AGENTS.md) (Englisch).
 
 ## Sprachen der Oberfläche
 
