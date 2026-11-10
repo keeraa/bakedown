@@ -14,10 +14,15 @@ BakeDown 是一款 Blender 插件，可将 AI 生成和摄影测量得到的高�
 
 ▶ **[观看 40 秒演示](docs/media/bakedown_demo.mp4)**
 
-| | |
+### 外观不变，三角面减少 95%
+
+| 全身，带纹理 | 全身，线框 |
 |---|---|
-| ![前后对比：原始高模（左）与简化结果（右）](docs/images/before_after_wireframe.png) | ![从原始模型（左）烘焙到简化网格（右）的纹理](docs/images/before_after_textured.png) |
-| 前后对比：原始高模（左）与简化结果（右） | 从原始模型（左）烘焙到简化网格（右）的纹理 |
+| ![全身，带纹理](docs/images/compare_full_textured.jpg) | ![全身，线框](docs/images/compare_full_wireframe.jpg) |
+| **特写，带纹理** | **特写，线框** |
+| ![特写，带纹理](docs/images/compare_closeup_textured.jpg) | ![特写，线框](docs/images/compare_closeup_wireframe.jpg) |
+
+原始模型（左）与 BakeDown 结果（右）：49,988 → 2,734 个三角面，近似形变 5.7 mm（0.44%），4K 烘焙。
 
 ## 安装
 

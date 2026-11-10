@@ -14,10 +14,15 @@ Author: **Kirill Migachev**
 
 ▶ **[Watch the 40-second demo](docs/media/bakedown_demo.mp4)**
 
-| | |
+### Same look, 95% fewer triangles
+
+| Full figure, textured | Full figure, wireframe |
 |---|---|
-| ![Before / after: original high-poly mesh (left) and the simplified result (right)](docs/images/before_after_wireframe.png) | ![Textures baked from the original (left) onto the simplified mesh (right)](docs/images/before_after_textured.png) |
-| Before / after: original high-poly mesh (left) and the simplified result (right) | Textures baked from the original (left) onto the simplified mesh (right) |
+| ![Full figure, textured](docs/images/compare_full_textured.jpg) | ![Full figure, wireframe](docs/images/compare_full_wireframe.jpg) |
+| **Close-up, textured** | **Close-up, wireframe** |
+| ![Close-up, textured](docs/images/compare_closeup_textured.jpg) | ![Close-up, wireframe](docs/images/compare_closeup_wireframe.jpg) |
+
+Original (left) vs BakeDown result (right): 49,988 → 2,734 triangles, approx. distortion 5.7 mm (0.44%), 4K bake.
 
 ## Installation
 

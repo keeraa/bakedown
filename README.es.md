@@ -14,10 +14,15 @@ Autor: **Kirill Migachev**
 
 ▶ **[Ver la demo de 40 segundos](docs/media/bakedown_demo.mp4)**
 
-| | |
+### El mismo aspecto con un 95 % menos de triángulos
+
+| Figura completa, con texturas | Figura completa, malla |
 |---|---|
-| ![Antes / después: malla original high-poly (izquierda) y resultado simplificado (derecha)](docs/images/before_after_wireframe.png) | ![Texturas horneadas del original (izquierda) sobre la malla simplificada (derecha)](docs/images/before_after_textured.png) |
-| Antes / después: malla original high-poly (izquierda) y resultado simplificado (derecha) | Texturas horneadas del original (izquierda) sobre la malla simplificada (derecha) |
+| ![Figura completa, con texturas](docs/images/compare_full_textured.jpg) | ![Figura completa, malla](docs/images/compare_full_wireframe.jpg) |
+| **Primer plano, con texturas** | **Primer plano, malla** |
+| ![Primer plano, con texturas](docs/images/compare_closeup_textured.jpg) | ![Primer plano, malla](docs/images/compare_closeup_wireframe.jpg) |
+
+Original (izquierda) frente al resultado de BakeDown (derecha): 49.988 → 2.734 triángulos, distorsión aprox. 5,7 mm (0,44 %), horneado 4K.
 
 ## Instalación
 

@@ -14,10 +14,15 @@ Autor: **Kirill Migachev**
 
 ▶ **[40-Sekunden-Demo ansehen](docs/media/bakedown_demo.mp4)**
 
-| | |
+### Gleiches Aussehen, 95 % weniger Dreiecke
+
+| Ganze Figur, texturiert | Ganze Figur, Drahtgitter |
 |---|---|
-| ![Vorher / nachher: Original-High-Poly-Mesh (links) und vereinfachtes Ergebnis (rechts)](docs/images/before_after_wireframe.png) | ![Vom Original (links) auf das vereinfachte Mesh (rechts) gebackene Texturen](docs/images/before_after_textured.png) |
-| Vorher / nachher: Original-High-Poly-Mesh (links) und vereinfachtes Ergebnis (rechts) | Vom Original (links) auf das vereinfachte Mesh (rechts) gebackene Texturen |
+| ![Ganze Figur, texturiert](docs/images/compare_full_textured.jpg) | ![Ganze Figur, Drahtgitter](docs/images/compare_full_wireframe.jpg) |
+| **Nahaufnahme, texturiert** | **Nahaufnahme, Drahtgitter** |
+| ![Nahaufnahme, texturiert](docs/images/compare_closeup_textured.jpg) | ![Nahaufnahme, Drahtgitter](docs/images/compare_closeup_wireframe.jpg) |
+
+Original (links) und BakeDown-Ergebnis (rechts): 49.988 → 2.734 Dreiecke, ca. 5,7 mm Verzerrung (0,44 %), 4K-Baking.
 
 ## Installation
 
