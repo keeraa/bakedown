@@ -10,7 +10,9 @@ El flujo es **no destructivo**: el original se guarda como copia de seguridad, p
 
 Autor: **Kirill Migachev**
 
-![El panel de BakeDown tras simplificar y hornear: 251.904 → 2.713 triángulos](docs/images/panel.png)
+[![Demo de BakeDown: 49.988 → 2.734 triángulos y horneado de texturas 4K](docs/images/demo_poster.jpg)](docs/media/bakedown_demo.mp4)
+
+▶ **[Ver la demo de 40 segundos](docs/media/bakedown_demo.mp4)**
 
 | | |
 |---|---|

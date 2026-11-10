@@ -10,7 +10,9 @@ BakeDown — аддон для Blender, который превращает тя
 
 Автор: **Kirill Migachev**
 
-![Панель BakeDown после упрощения и запекания: 251 904 → 2 713 треугольников](docs/images/panel.png)
+[![Демо BakeDown: 49 988 → 2 734 треугольника и запекание текстур в 4K](docs/images/demo_poster.jpg)](docs/media/bakedown_demo.mp4)
+
+▶ **[Смотреть 40-секундное демо](docs/media/bakedown_demo.mp4)**
 
 | | |
 |---|---|

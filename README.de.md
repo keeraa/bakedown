@@ -10,7 +10,9 @@ Der Ablauf ist **nicht-destruktiv**: Das Original bleibt als Sicherung erhalten,
 
 Autor: **Kirill Migachev**
 
-![Das BakeDown-Panel nach Vereinfachen und Backen: 251.904 → 2.713 Dreiecke](docs/images/panel.png)
+[![BakeDown-Demo: 49.988 → 2.734 Dreiecke, danach Textur-Baking in 4K](docs/images/demo_poster.jpg)](docs/media/bakedown_demo.mp4)
+
+▶ **[40-Sekunden-Demo ansehen](docs/media/bakedown_demo.mp4)**
 
 | | |
 |---|---|

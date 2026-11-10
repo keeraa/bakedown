@@ -10,7 +10,9 @@ The workflow is **non-destructive**: the original is kept as a backup, you can t
 
 Author: **Kirill Migachev**
 
-![The BakeDown panel after Simplify and Bake: 251,904 → 2,713 triangles](docs/images/panel.png)
+[![BakeDown demo: 49,988 → 2,734 triangles, then a 4K texture bake](docs/images/demo_poster.jpg)](docs/media/bakedown_demo.mp4)
+
+▶ **[Watch the 40-second demo](docs/media/bakedown_demo.mp4)**
 
 | | |
 |---|---|

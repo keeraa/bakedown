@@ -10,7 +10,9 @@ BakeDown 是一款 Blender 插件，可将 AI 生成和摄影测量得到的高�
 
 作者：**Kirill Migachev**
 
-![简化并烘焙后的 BakeDown 面板：251,904 → 2,713 个三角面](docs/images/panel.png)
+[![BakeDown 演示：49,988 → 2,734 个三角面，随后进行 4K 纹理烘焙](docs/images/demo_poster.jpg)](docs/media/bakedown_demo.mp4)
+
+▶ **[观看 40 秒演示](docs/media/bakedown_demo.mp4)**
 
 | | |
 |---|---|
