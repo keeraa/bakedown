@@ -1,13 +1,13 @@
 # BakeDown — developer notes
 
-**v1.2.2 · single file `bakedown.py` · Blender 4.2+**
+**v1.3.0 · single file `bakedown.py` · Blender 4.5+**
 Author: **Kirill Migachev** · License: **GPL-3.0-or-later**
 
 Read this before changing the add-on. Section 3 lists hard-won pitfalls.
 
 ---
 
-## 0. Architecture changes in 1.2–1.2.2
+## 0. Architecture changes in 1.2–1.3
 
 - All geometry processing is bound to `context.active_object`; `_activate_only()` deselects every other object before `bpy.ops` calls.
 - Geometry statistics go through `_triangle_count_mesh()` / `_triangle_count_object()` and count `mesh.loop_triangles`, not `mesh.polygons`.
@@ -18,6 +18,9 @@ Read this before changing the add-on. Section 3 lists hard-won pitfalls.
 - Export saves and restores selection, active object, visibility, image paths and formats; it checks that the folder is writable, that the exporter exists, that only one armature is involved, and warns about unusual scale.
 - **1.2.2:** a module-level `_BAKE_RUNNING` flag tells whether a bake is really running; a `load_post` handler clears a stale `scene.bakedown.is_baking` saved into a .blend file.
 - **1.2.2:** each LOD stores `bakedown_lod_src_sig` (geometry version + bake signature + material of its base). `_lod_state()` returns `OK`, `STALE` or `UNKNOWN`; export refuses `STALE` LODs.
+- **1.3.0:** `_fbx_export_kwargs(engine, path, has_armature)` holds the per-engine FBX settings (Unity: `FBX_SCALE_ALL`, `-Z` forward / `Y` up, `bake_space_transform` only without an armature).
+- **1.3.0:** distortion sampling and BVH construction use numpy (`_world_array`, up to 8,000 samples per direction).
+- **1.3.0:** `_tr()` translates in the `BakeDown` context (`_I18N_CTX`); every translation is registered in both the default and the BakeDown context.
 - UI source strings are English; translations are registered with `bpy.app.translations` (see section 6).
 
 ## 1. Architecture
@@ -147,7 +150,7 @@ English is the source language. `_TRANSLATIONS` maps a Blender locale to `{("*",
 | German | `de_DE` |
 | Simplified Chinese | `zh_HANS` (Blender 4.x+), `zh_CN` (older builds) |
 
-Blender's own translation wins when a string is identical to a built-in one (e.g. "Bake", "Export"), so those buttons follow Blender's wording.
+Strings drawn through `_tr()` use the `BakeDown` context, so BakeDown's own wording is used even when Blender has a built-in translation of the same English text (e.g. "Bake"). Property names and operator labels use the default context.
 
 ---
 

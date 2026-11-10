@@ -1,5 +1,21 @@
 # Changelog
 
+## 1.3.0 — 2026-11-10
+
+### Changed
+
+- **Minimum Blender version is now 4.5** (tested on 4.5.0 and 5.1.2).
+- Unity FBX export uses `FBX All` scaling and the Unity axis convention, applying the transform to static meshes, so models no longer arrive rotated by −90° or scaled ×100. Rigged exports keep the conversion on the object transforms.
+- Distortion is estimated from up to 8,000 evenly spread samples per direction (numpy) instead of ~1,200, so values are higher and more realistic.
+- UI strings use their own translation context, so BakeDown's wording is no longer replaced by Blender's built-in translation (e.g. Russian "Bake").
+- The panel title reads the version from `bl_info`.
+
+### Fixed
+
+- GLB export never flips the normal-map green channel (glTF requires OpenGL normal maps); the option is disabled for GLB.
+- **Delete backup** asks for confirmation; Delete backup, Generate LODs, Compare and Import rig template support Undo.
+- Rig transfer warns when it falls back to the only armature in the scene and when weight smoothing fails.
+
 ## 1.2.2 — 2026-11-10
 
 ### Added

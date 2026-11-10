@@ -2,7 +2,7 @@
 
 [English](README.md) · [Русский](README.ru.md) · **Español** · [Deutsch](README.de.md) · [简体中文](README.zh-CN.md)
 
-**Versión 1.2.2 · Blender 4.2+ · GPL-3.0-or-later**
+**Versión 1.3.0 · Blender 4.5+ · GPL-3.0-or-later**
 
 BakeDown es un complemento de Blender que convierte mallas pesadas generadas por IA o por fotogrametría (Hunyuan, Meshy, Tripo, Rodin, escaneos — a menudo 50k+ polígonos con una sola textura 4K) en **assets listos para juegos**. Simplifica solo la malla activa, hornea texturas PBR del original sobre la malla ligera, genera LOD, transfiere rigs y exporta a Unity, Unreal Engine o glTF.
 
@@ -22,7 +22,7 @@ Autor: **Kirill Migachev**
 | **Primer plano, con texturas** | **Primer plano, malla** |
 | ![Primer plano, con texturas](docs/images/compare_closeup_textured.jpg) | ![Primer plano, malla](docs/images/compare_closeup_wireframe.jpg) |
 
-Original (izquierda) frente al resultado de BakeDown (derecha): 49.988 → 2.734 triángulos, distorsión aprox. 5,7 mm (0,44 %), horneado 4K.
+Original (izquierda) frente al resultado de BakeDown (derecha): 49.988 → 2.734 triángulos, distorsión aprox. 7,3 mm (0,56 %), horneado 4K.
 
 ## Instalación
 

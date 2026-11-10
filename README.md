@@ -2,7 +2,7 @@
 
 **English** · [Русский](README.ru.md) · [Español](README.es.md) · [Deutsch](README.de.md) · [简体中文](README.zh-CN.md)
 
-**Version 1.2.2 · Blender 4.2+ · GPL-3.0-or-later**
+**Version 1.3.0 · Blender 4.5+ · GPL-3.0-or-later**
 
 BakeDown is a Blender add-on that turns heavy AI-generated and photogrammetry meshes (Hunyuan, Meshy, Tripo, Rodin, scans — often 50k+ polygons with a single 4K texture) into **game-ready assets**. It simplifies only the active mesh, bakes PBR textures from the original onto the light mesh, generates LODs, transfers rigs, and exports to Unity, Unreal Engine or glTF.
 
@@ -22,7 +22,7 @@ Author: **Kirill Migachev**
 | **Close-up, textured** | **Close-up, wireframe** |
 | ![Close-up, textured](docs/images/compare_closeup_textured.jpg) | ![Close-up, wireframe](docs/images/compare_closeup_wireframe.jpg) |
 
-Original (left) vs BakeDown result (right): 49,988 → 2,734 triangles, approx. distortion 5.7 mm (0.44%), 4K bake.
+Original (left) vs BakeDown result (right): 49,988 → 2,734 triangles, approx. distortion 7.3 mm (0.56%), 4K bake.
 
 ## Installation
 

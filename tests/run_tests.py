@@ -240,6 +240,88 @@ def translations_complete():
     assert not problems, "\n".join(problems)
 
 
+@test
+def version_label_matches_bl_info():
+    v = ".".join(str(n) for n in bd.bl_info["version"])
+    assert bd.VIEW3D_PT_bakedown.bl_label.endswith("v" + v)
+    assert bd.bl_info["blender"] >= (4, 5, 0)
+
+
+@test
+def destructive_operators_support_undo():
+    for cls in (bd.OBJECT_OT_bakedown_finalize, bd.OBJECT_OT_bakedown_lod,
+                bd.OBJECT_OT_bakedown_compare, bd.OBJECT_OT_bakedown_rigimport,
+                bd.OBJECT_OT_bakedown_decimate, bd.OBJECT_OT_bakedown_reset):
+        assert 'UNDO' in cls.bl_options, cls.__name__
+    assert hasattr(bd.OBJECT_OT_bakedown_finalize, "invoke")   # confirmation dialog
+
+
+@test
+def fbx_settings_per_engine():
+    unity_static = bd._fbx_export_kwargs('UNITY', "x.fbx", False)
+    unity_rigged = bd._fbx_export_kwargs('UNITY', "x.fbx", True)
+    unreal = bd._fbx_export_kwargs('UNREAL', "x.fbx", False)
+    assert unity_static['apply_scale_options'] == 'FBX_SCALE_ALL'
+    assert unity_static['bake_space_transform'] is True
+    assert unity_rigged['bake_space_transform'] is False
+    assert 'apply_scale_options' not in unreal and unreal['mesh_smooth_type'] == 'FACE'
+    # the exporter accepts every keyword
+    fresh()
+    o = sphere("F", 2)
+    make_active(o)
+    path = os.path.join(OUT, "kw.fbx")
+    assert bpy.ops.export_scene.fbx(**dict(unity_static, filepath=path)) == {'FINISHED'}
+
+
+@test
+def glb_never_flips_normal_green():
+    import numpy as np
+    fresh()
+    o = sphere("G", 3)
+    simplify(o, 200)
+    im = bpy.data.images.new("G_Normal", 8, 8)
+    im.pixels.foreach_set(np.tile(np.array([0.5, 0.2, 1.0, 1.0], np.float32), 64))
+    im.pack()
+    o["bakedown_image_Normal"] = im.name
+    make_active(o)
+    assert bpy.ops.object.bakedown_export(
+        directory=OUT, target_engine='GLTF', save_textures=True,
+        flip_normal_green=True) == {'FINISHED'}
+    saved = bpy.data.images.load(os.path.join(OUT, "G", "G_Normal.png"))
+    px = np.empty(len(saved.pixels), np.float32)
+    saved.pixels.foreach_get(px)
+    assert abs(px[1] - 0.2) < 0.02, px[:4]
+
+
+@test
+def ui_strings_use_own_translation_context():
+    view = bpy.context.preferences.view
+    old = (view.language, view.use_translate_interface)
+    try:
+        view.language = 'ru_RU'
+        view.use_translate_interface = True
+        assert bd._tr("Bake") == "Текстурировать", bd._tr("Bake")
+        assert bd._tr("Simplify") == "Упростить", bd._tr("Simplify")
+        view.language = 'es'
+        assert bd._tr("Bake") == "Hornear"
+    finally:
+        view.language, view.use_translate_interface = old
+
+
+@test
+def distortion_sampling_is_dense_and_fast():
+    import time
+    fresh()
+    o = sphere("H", 7)          # ~328k triangles
+    pts = bd._sample_mesh_points(o.data, o.matrix_world)
+    assert 7000 <= len(pts) <= 8000
+    t = time.perf_counter()
+    tree = bd._mesh_bvh_world(o.data, o.matrix_world)
+    d = bd._max_distance_to_tree(pts, tree)
+    assert d < 1e-4
+    assert time.perf_counter() - t < 10.0
+
+
 # ---------------------------------------------------------------------------
 def main():
     failed = 0

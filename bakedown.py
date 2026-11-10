@@ -3,8 +3,8 @@
 bl_info = {
     "name": "BakeDown — Game Asset Optimizer",
     "author": "Kirill Migachev",
-    "version": (1, 2, 2),
-    "blender": (4, 2, 0),
+    "version": (1, 3, 0),
+    "blender": (4, 5, 0),
     "location": "View3D > Sidebar > BakeDown",
     "description": ("Turn AI-generated and photogrammetry meshes into game-ready assets: "
                     "active-object-only simplification, texture baking, LODs, rig transfer, "
@@ -17,6 +17,10 @@ import math
 import os
 import tempfile
 import uuid
+
+# Own translation context: strings such as "Bake" or "Export" also exist in Blender's
+# built-in catalogue, and Blender's translation wins in the default context.
+_I18N_CTX = "BakeDown"
 
 
 _TRANSLATIONS = {
@@ -681,9 +685,46 @@ _TRANSLATIONS["de_DE"] = {("*", k): v for k, v in _DE.items()}
 _TRANSLATIONS["zh_HANS"] = {("*", k): v for k, v in _ZH.items()}
 _TRANSLATIONS["zh_CN"] = dict(_TRANSLATIONS["zh_HANS"])   # Blender < 4.0 locale name
 
+_NEW_1_3 = {
+    "Delete the original mesh backup? Reset will no longer be possible.": {
+        "ru_RU": "Удалить резервную копию оригинала? Сброс станет невозможен.",
+        "es": "¿Eliminar la copia de seguridad de la malla original? Ya no se podrá restablecer.",
+        "de_DE": "Sicherung des Original-Meshes löschen? Zurücksetzen ist danach nicht mehr möglich.",
+        "zh_HANS": "删除原始网格备份？之后将无法重置。",
+    },
+    "glTF requires OpenGL normal maps; the green channel was not flipped": {
+        "ru_RU": "glTF требует normal map в формате OpenGL; зелёный канал не инвертирован",
+        "es": "glTF requiere mapas de normales OpenGL; el canal verde no se invirtió",
+        "de_DE": "glTF erfordert OpenGL-Normal-Maps; der Grünkanal wurde nicht invertiert",
+        "zh_HANS": "glTF 要求 OpenGL 法线贴图；未翻转绿色通道",
+    },
+    "The template has no armature modifier or parent; using the only armature in the scene: {}": {
+        "ru_RU": "У шаблона нет модификатора Armature или родителя-скелета; использован единственный скелет в сцене: {}",
+        "es": "La plantilla no tiene modificador Armature ni padre esqueleto; se usa el único esqueleto de la escena: {}",
+        "de_DE": "Die Vorlage hat keinen Armature-Modifier oder Skelett-Parent; das einzige Skelett der Szene wird verwendet: {}",
+        "zh_HANS": "模板没有骨架修改器或骨架父级；已使用场景中唯一的骨架：{}",
+    },
+    "Weight smoothing failed: {}": {
+        "ru_RU": "Сглаживание весов не удалось: {}",
+        "es": "Error al suavizar los pesos: {}",
+        "de_DE": "Glätten der Gewichte fehlgeschlagen: {}",
+        "zh_HANS": "权重平滑失败：{}",
+    },
+}
+for _msg, _by_locale in _NEW_1_3.items():
+    for _loc, _txt in _by_locale.items():
+        _TRANSLATIONS[_loc][("*", _msg)] = _txt
+    _TRANSLATIONS["zh_CN"][("*", _msg)] = _by_locale["zh_HANS"]
+
+# Every entry is available both in the default context (property names, operator
+# labels) and in BakeDown's own context (strings drawn through _tr()).
+for _loc in list(_TRANSLATIONS):
+    for (_ctx, _msg), _txt in list(_TRANSLATIONS[_loc].items()):
+        _TRANSLATIONS[_loc][(_I18N_CTX, _msg)] = _txt
+
 
 def _tr(text):
-    return bpy.app.translations.pgettext_iface(text)
+    return bpy.app.translations.pgettext_iface(text, _I18N_CTX)
 
 
 def _triangle_count_mesh(mesh):
@@ -898,6 +939,22 @@ def _safe_name(value):
     return cleaned or "BakeDownAsset"
 
 
+def _fbx_export_kwargs(engine, path, has_armature):
+    """FBX exporter settings per target engine."""
+    kwargs = dict(filepath=path, use_selection=True, path_mode='RELATIVE',
+                  embed_textures=False, add_leaf_bones=False,
+                  mesh_smooth_type='FACE' if engine == 'UNREAL' else 'OFF')
+    if engine == 'UNITY':
+        # Avoid Unity's classic import result: -90° on X and a x100 scale.
+        kwargs['apply_scale_options'] = 'FBX_SCALE_ALL'
+        kwargs['axis_forward'] = '-Z'
+        kwargs['axis_up'] = 'Y'
+        # Baking the axis conversion into the data is reliable for static meshes but
+        # can break armatures, so rigged exports keep it on the object transforms.
+        kwargs['bake_space_transform'] = not has_armature
+    return kwargs
+
+
 def _armatures_for_objects(objects):
     arms = set()
     for obj in objects:
@@ -1011,28 +1068,44 @@ def _bake_ray(lo, pg):
     return extrusion, raydist
 
 
-def _sample_mesh_points(mesh, matrix_world, max_vertices=700, max_faces=500):
-    """Sample vertices and polygon centers in world space without copying a heavy mesh."""
-    points = []
-    nv = len(mesh.vertices)
-    if nv:
-        step = max(1, nv // max_vertices)
-        for i in range(0, nv, step):
-            points.append(matrix_world @ mesh.vertices[i].co)
-    nf = len(mesh.polygons)
-    if nf:
-        step = max(1, nf // max_faces)
-        for i in range(0, nf, step):
-            points.append(matrix_world @ mesh.polygons[i].center)
-    return points
+def _world_array(collection, attr, matrix_world):
+    """World-space coordinates of a vertex/polygon attribute as an (N, 3) numpy array."""
+    import numpy as np
+    n = len(collection)
+    co = np.empty(n * 3, dtype=np.float32)
+    collection.foreach_get(attr, co)
+    m = np.array(matrix_world, dtype=np.float64)
+    return co.reshape(n, 3) @ m[:3, :3].T + m[:3, 3]
+
+
+def _sample_mesh_points(mesh, matrix_world, max_points=8000):
+    """Evenly spread samples of vertices and polygon centers in world space."""
+    import numpy as np
+    from mathutils import Vector
+    parts = []
+    if len(mesh.vertices):
+        parts.append(_world_array(mesh.vertices, "co", matrix_world))
+    if len(mesh.polygons):
+        parts.append(_world_array(mesh.polygons, "center", matrix_world))
+    if not parts:
+        return []
+    pts = np.concatenate(parts)
+    if len(pts) > max_points:
+        pts = pts[np.linspace(0, len(pts) - 1, max_points).astype(np.int64)]
+    return [Vector(p) for p in pts]
 
 
 def _mesh_bvh_world(mesh, matrix_world):
+    import numpy as np
     from mathutils.bvhtree import BVHTree
     if mesh is None or not mesh.vertices or not mesh.polygons:
         raise ValueError("Mesh has no surface geometry")
-    verts = [matrix_world @ v.co for v in mesh.vertices]
-    polys = [tuple(p.vertices) for p in mesh.polygons]
+    verts = _world_array(mesh.vertices, "co", matrix_world).tolist()
+    totals = np.empty(len(mesh.polygons), dtype=np.int64)
+    mesh.polygons.foreach_get("loop_total", totals)
+    loop_verts = np.empty(len(mesh.loops), dtype=np.int64)
+    mesh.loops.foreach_get("vertex_index", loop_verts)
+    polys = [p.tolist() for p in np.split(loop_verts, np.cumsum(totals)[:-1])]
     return BVHTree.FromPolygons(verts, polys, all_triangles=False)
 
 
@@ -1625,7 +1698,13 @@ class OBJECT_OT_bakedown_finalize(bpy.types.Operator):
     bl_idname = "object.bakedown_finalize"
     bl_label = "Delete backup"
     bl_description = "Release the original mesh backup after you are satisfied with the result"
-    bl_options = {'REGISTER'}
+    bl_options = {'REGISTER', 'UNDO'}
+
+    def invoke(self, context, event):
+        return context.window_manager.invoke_confirm(
+            self, event, title=_tr("Delete backup"),
+            message=_tr("Delete the original mesh backup? Reset will no longer be possible."),
+            icon='WARNING')
 
     def execute(self, context):
         o = context.active_object
@@ -2178,7 +2257,9 @@ class OBJECT_OT_bakedown_export(bpy.types.Operator):
     def draw(self, context):
         self.layout.prop(self, 'target_engine', expand=True)
         self.layout.prop(self, 'save_textures')
-        self.layout.prop(self, 'flip_normal_green')
+        row = self.layout.row()
+        row.enabled = self.target_engine != 'GLTF'   # glTF mandates OpenGL normal maps
+        row.prop(self, 'flip_normal_green')
         self.layout.prop(self, 'pack_orm')
 
     def _validate_exporter(self):
@@ -2267,6 +2348,10 @@ class OBJECT_OT_bakedown_export(bpy.types.Operator):
                     self.report({'WARNING'}, _tr("Non-uniform scale detected; consider applying scale before export"))
                     break
 
+            # glTF mandates OpenGL (Y+) normal maps: never flip for GLB.
+            flip_green = self.flip_normal_green and self.target_engine != 'GLTF'
+            if self.flip_normal_green and self.target_engine == 'GLTF':
+                self.report({'WARNING'}, _tr("glTF requires OpenGL normal maps; the green channel was not flipped"))
             found_images = []
             if self.save_textures:
                 for suffix in ("BaseColor", "Rough", "Metal", "Normal"):
@@ -2278,7 +2363,7 @@ class OBJECT_OT_bakedown_export(bpy.types.Operator):
                     saved_path = os.path.join(d, f"{_safe_name(base)}_{suffix}.png")
                     self._save_image_safely(
                         image, saved_path,
-                        flip_green=self.flip_normal_green and suffix == "Normal")
+                        flip_green=flip_green and suffix == "Normal")
                     # The FBX exporter reads the image datablock path, not the path
                     # used by image.save(). Keep it pointed at the just-written PNG
                     # until export is complete, then restore it in finally.
@@ -2289,13 +2374,6 @@ class OBJECT_OT_bakedown_export(bpy.types.Operator):
                 if self.pack_orm:
                     orm_image = self._save_orm(base_obj, d)
 
-            # GLB embeds the current image pixels. Keep a requested DirectX normal
-            # conversion active only for the duration of the export, then restore it.
-            if self.target_engine == 'GLTF' and self.flip_normal_green:
-                normal_image = _baked_image(base_obj, "Normal")
-                if normal_image is not None:
-                    self._invert_green(normal_image)
-                    flipped_images.append(normal_image)
 
             # Activate an object from the export set, never the hidden base object:
             # otherwise the base mesh is exported next to LOD0 as a duplicate.
@@ -2311,10 +2389,8 @@ class OBJECT_OT_bakedown_export(bpy.types.Operator):
                     filepath=path, use_selection=True, export_format='GLB')
             else:
                 path = os.path.join(d, f"{_safe_name(base)}.fbx")
-                kwargs = dict(filepath=path, use_selection=True, path_mode='RELATIVE',
-                              embed_textures=False, add_leaf_bones=False)
-                kwargs['mesh_smooth_type'] = 'FACE' if self.target_engine == 'UNREAL' else 'OFF'
-                op_result = bpy.ops.export_scene.fbx(**kwargs)
+                op_result = bpy.ops.export_scene.fbx(
+                    **_fbx_export_kwargs(self.target_engine, path, bool(arms)))
             if 'FINISHED' not in op_result:
                 raise RuntimeError(f"Blender exporter returned {op_result}")
 
@@ -2394,7 +2470,7 @@ class OBJECT_OT_bakedown_compare(bpy.types.Operator):
     bl_idname = "object.bakedown_compare"
     bl_label = "Compare with original"
     bl_description = "Toggle the original mesh and the simplified result"
-    bl_options = {'REGISTER'}
+    bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
         active = context.active_object
@@ -2438,7 +2514,7 @@ class OBJECT_OT_bakedown_lod(bpy.types.Operator):
     bl_idname = "object.bakedown_lod"
     bl_label = "Generate LODs"
     bl_description = "Generate LOD0–LOD3 from the active BakeDown object"
-    bl_options = {'REGISTER'}
+    bl_options = {'REGISTER', 'UNDO'}
 
     @classmethod
     def poll(cls, context):
@@ -2582,7 +2658,7 @@ class OBJECT_OT_bakedown_rigimport(bpy.types.Operator):
     bl_idname = "object.bakedown_rigimport"
     bl_label = "Import rig template"
     bl_description = "Import a skinned FBX and use it as the rig template"
-    bl_options = {'REGISTER'}
+    bl_options = {'REGISTER', 'UNDO'}
 
     filepath: bpy.props.StringProperty(subtype='FILE_PATH')
     filter_glob: bpy.props.StringProperty(default="*.fbx;*.FBX", options={'HIDDEN'})
@@ -2693,6 +2769,9 @@ class OBJECT_OT_bakedown_rigtransfer(bpy.types.Operator):
             arms = [a for a in bpy.data.objects if a.type == 'ARMATURE']
             if len(arms) == 1:
                 arm = arms[0]
+                self.report({'WARNING'}, _tr(
+                    "The template has no armature modifier or parent; using the only armature in the scene: {}"
+                ).format(arm.name))
         if arm is None:
             self.report({'ERROR'}, _tr("No armature was found on the template"))
             return {'CANCELLED'}
@@ -2754,7 +2833,8 @@ class OBJECT_OT_bakedown_rigtransfer(bpy.types.Operator):
                 bpy.ops.object.vertex_group_smooth(group_select_mode='ALL', factor=0.5, repeat=2)
                 bpy.ops.object.mode_set(mode='OBJECT')
             bpy.ops.object.vertex_group_normalize_all(lock_active=False)
-        except Exception:
+        except Exception as exc:
+            self.report({'WARNING'}, _tr("Weight smoothing failed: {}").format(exc))
             try:
                 bpy.ops.object.mode_set(mode='OBJECT')
             except Exception:
@@ -2777,7 +2857,7 @@ class OBJECT_OT_bakedown_rigtransfer(bpy.types.Operator):
 # Panel
 # ---------------------------------------------------------------------------
 class VIEW3D_PT_bakedown(bpy.types.Panel):
-    bl_label = "BakeDown  ·  v1.2.2"
+    bl_label = "BakeDown  ·  v" + ".".join(str(n) for n in bl_info["version"])
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
     bl_category = 'BakeDown'
