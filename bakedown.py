@@ -3,7 +3,7 @@
 bl_info = {
     "name": "BakeDown — Game Asset Optimizer",
     "author": "Kirill Migachev",
-    "version": (1, 4, 0),
+    "version": (1, 4, 1),
     "blender": (4, 5, 0),
     "location": "View3D > Sidebar > BakeDown",
     "description": ("Turn heavy meshes — AI-generated, scanned, sculpted or downloaded — into "
@@ -2916,7 +2916,7 @@ class VIEW3D_PT_bakedown(bpy.types.Panel):
         elif has_mesh and "bakedown_distort_mm" in o:
             mm = o["bakedown_distort_mm"]
             dp = o.get("bakedown_distort_pct", 0.0)
-            bad = dp > 0.5
+            bad = dp > 1.0      # matches AGENTS.md: > 1 % is visibly different
             rr = layout.row(); rr.alert = bad
             rr.operator('object.bakedown_distort_info',
                         text=_tr("Approx. distortion: {:.1f} mm ({:.2f}%)").format(mm, dp),
@@ -3171,6 +3171,9 @@ def _api_object(obj):
 
 def _api_activate(obj):
     context = bpy.context
+    # Objects linked from scripts (bpy.data.objects.new + link) only appear in the
+    # view layer after an update — typical for AI agents building scenes in code.
+    context.view_layer.update()
     if obj.name not in context.view_layer.objects:
         raise BakeDownError(f"{obj.name!r} is not in the current view layer")
     if context.mode != 'OBJECT' and context.view_layer.objects.active is not None:

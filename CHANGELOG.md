@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.4.1 — 2026-11-10
+
+### Fixed
+
+- API: objects created from code (`bpy.data.objects.new` + link) were rejected as "not in the current view layer" until Blender updated the scene — the usual way AI agents build scenes. Found while driving BakeDown through Blender MCP.
+- The panel marks distortion red only above 1 % (was 0.5 %), matching the denser 1.3 estimate and the guidance in AGENTS.md.
+
 ## 1.4.0 — 2026-11-10
 
 ### Added

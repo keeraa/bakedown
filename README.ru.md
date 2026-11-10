@@ -2,7 +2,7 @@
 
 [English](README.md) · **Русский** · [Español](README.es.md) · [Deutsch](README.de.md) · [简体中文](README.zh-CN.md)
 
-**Версия 1.4.0 · Blender 4.5+ · GPL-3.0-or-later**
+**Версия 1.4.1 · Blender 4.5+ · GPL-3.0-or-later**
 
 BakeDown — аддон для Blender, который превращает тяжёлые меши из нейросетей и фотограмметрии (Hunyuan, Meshy, Tripo, Rodin, сканы — часто 50k+ полигонов с одной 4K-текстурой) в **игровые ассеты**. Он упрощает только активный меш, запекает PBR-текстуры с оригинала на лёгкий меш, генерирует LOD, переносит риг и экспортирует в Unity, Unreal Engine или glTF.
 

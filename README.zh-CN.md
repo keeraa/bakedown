@@ -2,7 +2,7 @@
 
 [English](README.md) · [Русский](README.ru.md) · [Español](README.es.md) · [Deutsch](README.de.md) · **简体中文**
 
-**版本 1.4.0 · Blender 4.5+ · GPL-3.0-or-later**
+**版本 1.4.1 · Blender 4.5+ · GPL-3.0-or-later**
 
 BakeDown 是一款 Blender 插件，可将 AI 生成和摄影测量得到的高面数网格（Hunyuan、Meshy、Tripo、Rodin、扫描模型——通常 5 万面以上并带一张 4K 纹理）转换为**可直接用于游戏的资产**。它只简化活动网格，把原始模型的 PBR 纹理烘焙到轻量网格上，生成 LOD，迁移骨骼绑定，并导出到 Unity、Unreal Engine 或 glTF。
 

@@ -343,6 +343,16 @@ def api_full_pipeline_headless():
 
 
 @test
+def api_accepts_objects_linked_from_code():
+    fresh()
+    src = sphere("Src", 4)
+    obj = bpy.data.objects.new("Linked", src.data.copy())     # how agents usually create objects
+    C.scene.collection.objects.link(obj)
+    r = bd.simplify(obj, triangles=500)
+    assert r["object"] == "Linked" and r["triangles"] <= 500
+
+
+@test
 def api_errors_are_readable():
     fresh()
     o = sphere("E", 2)

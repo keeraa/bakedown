@@ -1,8 +1,8 @@
-# Verification — BakeDown 1.4.0
+# Verification — BakeDown 1.4.1
 
 ## Automated (headless Blender)
 
-`tests/run_tests.py` — **19/19 PASS** on Blender **5.1.2** and **4.5.0** (macOS):
+`tests/run_tests.py` — **20/20 PASS** on Blender **5.1.2** and **4.5.0** (macOS):
 
 | Test | Checks |
 |---|---|
@@ -22,6 +22,7 @@
 | `ui_strings_use_own_translation_context` | "Bake" shows BakeDown's Russian / Spanish wording, not Blender's |
 | `distortion_sampling_is_dense_and_fast` | ~8,000 samples, exact zero on identical meshes, under 10 s on a dense ico sphere |
 | `api_full_pipeline_headless` | `simplify` → blocking `bake` → `generate_lods` → `export` in background mode; settings restored |
+| `api_accepts_objects_linked_from_code` | an object created with `bpy.data.objects.new` + link is accepted by the API |
 | `api_errors_are_readable` | wrong arguments raise `BakeDownError` with a clear message |
 | `cli_processes_a_file_and_reports_json` | CLI turns a .glb into a baked GLB with LODs and a JSON report; exit code 1 on a missing file |
 | `translations_complete` | every UI string has ru / es / de / zh translations with matching placeholders |
@@ -31,6 +32,10 @@ A live check with Blender's interface language switched to `ru_RU`, `es`, `de_DE
 ## Desktop runs (Blender 5.1.2 GUI, macOS)
 
 A scripted GUI session built a 251,904-triangle textured mesh, simplified it to 2,713 triangles (≈0.37% distortion), ran the real modal Cycles bake at 2K (Base Color, Roughness, Metallic, Normal — finished, no rollback), and exported a Unity FBX with four PNG maps. The README comparison screenshots come from a second GUI run on a 49,988-triangle character (2,734 after Simplify, 4K bake). Versions 1.3.0 and 1.4.0 repeated the modal bake and Unity FBX export successfully. In 1.4.0 the CLI processed the same character headless in 4.8 s (2,734 triangles, 2K bake, LOD 2,734 / 1,366 / 682 / 272, Unity FBX + 4 PNG).
+
+## Blender MCP run (user's Blender 5.1.2, live scene)
+
+An agent session reloaded the add-on in the running Blender through Blender MCP, copied the user's character from its original backup and called `bakedown.process(obj, triangles=3000, resolution=2048, lods=(50, 25, 10), export_dir=…, engine="UNITY")`: 49,988 → 2,734 triangles, 2K bake, LOD 2,734 / 1,366 / 682 / 272, Unity FBX + 4 PNG in 5.2 s. The user's own object was not modified. The run exposed the view-layer bug fixed in 1.4.1.
 
 ## Still manual
 
