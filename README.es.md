@@ -10,9 +10,16 @@ El flujo es **no destructivo**: el original se guarda como copia de seguridad, p
 
 Autor: **Kirill Migachev**
 
+![El panel de BakeDown tras simplificar y hornear: 251.904 → 2.713 triángulos](docs/images/panel.png)
+
+| | |
+|---|---|
+| ![Antes / después: malla original high-poly (izquierda) y resultado simplificado (derecha)](docs/images/before_after_wireframe.png) | ![Texturas horneadas del original (izquierda) sobre la malla simplificada (derecha)](docs/images/before_after_textured.png) |
+| Antes / después: malla original high-poly (izquierda) y resultado simplificado (derecha) | Texturas horneadas del original (izquierda) sobre la malla simplificada (derecha) |
+
 ## Instalación
 
-1. Descarga `bakedown.py` de este repositorio (o de una versión publicada).
+1. Descarga `bakedown.py` de la [última versión](https://github.com/keeraa/bakedown/releases/latest).
 2. En Blender: **Edit → Preferences → Add-ons → Install from Disk…** y elige `bakedown.py`.
 3. Activa **BakeDown — Game Asset Optimizer**.
 4. Abre la barra lateral de la vista 3D con **N** y selecciona la pestaña **BakeDown**.

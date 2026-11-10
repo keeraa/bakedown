@@ -10,9 +10,16 @@ Der Ablauf ist **nicht-destruktiv**: Das Original bleibt als Sicherung erhalten,
 
 Autor: **Kirill Migachev**
 
+![Das BakeDown-Panel nach Vereinfachen und Backen: 251.904 → 2.713 Dreiecke](docs/images/panel.png)
+
+| | |
+|---|---|
+| ![Vorher / nachher: Original-High-Poly-Mesh (links) und vereinfachtes Ergebnis (rechts)](docs/images/before_after_wireframe.png) | ![Vom Original (links) auf das vereinfachte Mesh (rechts) gebackene Texturen](docs/images/before_after_textured.png) |
+| Vorher / nachher: Original-High-Poly-Mesh (links) und vereinfachtes Ergebnis (rechts) | Vom Original (links) auf das vereinfachte Mesh (rechts) gebackene Texturen |
+
 ## Installation
 
-1. `bakedown.py` aus diesem Repository (oder einem Release) herunterladen.
+1. `bakedown.py` aus dem [neuesten Release](https://github.com/keeraa/bakedown/releases/latest) herunterladen.
 2. In Blender: **Edit → Preferences → Add-ons → Install from Disk…** und `bakedown.py` auswählen.
 3. **BakeDown — Game Asset Optimizer** aktivieren.
 4. Die Seitenleiste der 3D-Ansicht mit **N** öffnen und den Reiter **BakeDown** wählen.

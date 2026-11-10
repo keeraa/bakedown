@@ -10,9 +10,16 @@ BakeDown — аддон для Blender, который превращает тя
 
 Автор: **Kirill Migachev**
 
+![Панель BakeDown после упрощения и запекания: 251 904 → 2 713 треугольников](docs/images/panel.png)
+
+| | |
+|---|---|
+| ![До и после: исходный high-poly меш (слева) и упрощённый результат (справа)](docs/images/before_after_wireframe.png) | ![Текстуры, запечённые с оригинала (слева) на упрощённый меш (справа)](docs/images/before_after_textured.png) |
+| До и после: исходный high-poly меш (слева) и упрощённый результат (справа) | Текстуры, запечённые с оригинала (слева) на упрощённый меш (справа) |
+
 ## Установка
 
-1. Скачайте `bakedown.py` из этого репозитория (или из релиза).
+1. Скачайте `bakedown.py` из [последнего релиза](https://github.com/keeraa/bakedown/releases/latest).
 2. В Blender: **Edit → Preferences → Add-ons → Install from Disk…** и выберите `bakedown.py`.
 3. Включите **BakeDown — Game Asset Optimizer**.
 4. Откройте боковую панель 3D-вида клавишей **N** и выберите вкладку **BakeDown**.

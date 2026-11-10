@@ -10,9 +10,16 @@ The workflow is **non-destructive**: the original is kept as a backup, you can t
 
 Author: **Kirill Migachev**
 
+![The BakeDown panel after Simplify and Bake: 251,904 → 2,713 triangles](docs/images/panel.png)
+
+| | |
+|---|---|
+| ![Before / after: original high-poly mesh (left) and the simplified result (right)](docs/images/before_after_wireframe.png) | ![Textures baked from the original (left) onto the simplified mesh (right)](docs/images/before_after_textured.png) |
+| Before / after: original high-poly mesh (left) and the simplified result (right) | Textures baked from the original (left) onto the simplified mesh (right) |
+
 ## Installation
 
-1. Download `bakedown.py` from this repository (or from a release).
+1. Download `bakedown.py` from the [latest release](https://github.com/keeraa/bakedown/releases/latest).
 2. In Blender: **Edit → Preferences → Add-ons → Install from Disk…** and select `bakedown.py`.
 3. Enable **BakeDown — Game Asset Optimizer**.
 4. Open the 3D View sidebar with **N** and select the **BakeDown** tab.

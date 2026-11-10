@@ -19,9 +19,13 @@
 
 A live check with Blender's interface language switched to `ru_RU`, `es`, `de_DE` and `zh_HANS` shows the translated strings.
 
-## Still manual (cannot run in background mode)
+## Desktop run (Blender 5.1.2 GUI, macOS)
 
-1. A complete Cycles selected-to-active bake through the desktop modal event loop.
+A scripted GUI session built a 251,904-triangle textured mesh, simplified it to 2,713 triangles (≈0.37% distortion), ran the real modal Cycles bake at 2K (Base Color, Roughness, Metallic, Normal — finished, no rollback), and exported a Unity FBX with four PNG maps. The README screenshots come from this run.
+
+## Still manual
+
+1. A long 4K bake on a real AI-generated asset.
 2. Pressing Esc between real 4K bake passes; Ctrl+Z is ignored while baking.
 3. Visual inspection of Base Color, Roughness, Metallic and tangent Normal quality.
 4. Importing the exported FBX into Unity / Unreal and checking materials and the LOD Group.

@@ -10,9 +10,16 @@ BakeDown 是一款 Blender 插件，可将 AI 生成和摄影测量得到的高�
 
 作者：**Kirill Migachev**
 
+![简化并烘焙后的 BakeDown 面板：251,904 → 2,713 个三角面](docs/images/panel.png)
+
+| | |
+|---|---|
+| ![前后对比：原始高模（左）与简化结果（右）](docs/images/before_after_wireframe.png) | ![从原始模型（左）烘焙到简化网格（右）的纹理](docs/images/before_after_textured.png) |
+| 前后对比：原始高模（左）与简化结果（右） | 从原始模型（左）烘焙到简化网格（右）的纹理 |
+
 ## 安装
 
-1. 从本仓库（或发布页）下载 `bakedown.py`。
+1. 从[最新发布版](https://github.com/keeraa/bakedown/releases/latest)下载 `bakedown.py`。
 2. 在 Blender 中：**Edit → Preferences → Add-ons → Install from Disk…**，选择 `bakedown.py`。
 3. 启用 **BakeDown — Game Asset Optimizer**。
 4. 按 **N** 打开 3D 视图侧边栏，选择 **BakeDown** 标签页。
