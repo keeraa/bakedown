@@ -17,7 +17,7 @@
 
 **−94% triangles · same look · PBR textures baked in seconds**
 
-[**⬇ Download**](https://github.com/keeraa/bakedown/releases/latest) · [▶ 40-second demo](docs/media/bakedown_demo.mp4) · [🤖 For AI agents](AGENTS.md) · [❓ FAQ](docs/FAQ.md)
+[**⬇ Download**](https://github.com/keeraa/bakedown/releases/latest) · [🤖 For AI agents](AGENTS.md) · [❓ FAQ](docs/FAQ.md)
 
 </div>
 
@@ -40,12 +40,12 @@ Characters: **Simplify → Bake → Rig → LOD → Export** (LODs made after th
 | Keep the original, undo everything | duplicate and track it yourself | ✅ automatic backup, one-click **Reset** |
 | Choose the result | guess a Decimate ratio | ✅ target triangles **or** an allowed shape error, shown in mm and % |
 | Clean AI / scan meshes | weld, loose parts, normals, custom split normals by hand | ✅ built into **Simplify** |
-| Keep the look | set up 4 selected-to-active bakes, UVs, materials | ✅ Base Color, Roughness, Metallic, Normal in one click, rollback on cancel |
+| Keep the look | set up 5 selected-to-active bakes, UVs, materials | ✅ Base Color, Roughness, Metallic, Normal, AO in one click, rollback on cancel |
 | LODs | duplicate, decimate, re-rig, rename | ✅ LOD0–LOD3 presets, shared textures, armature-aware, stale-LOD warning |
 | Engine export | remember axis, scale, smoothing, normal-map rules | ✅ Unity / Unreal / glTF presets |
 | Automation | write and debug `bpy` scripts | ✅ Python API + CLI with a JSON report |
 
-A 50k-triangle character becomes 3k triangles with a 2K PBR bake, four LODs and a Unity FBX in **about 5 seconds**.
+A 50k-triangle character becomes 3k triangles with a 2K PBR bake, four LODs and a Unity FBX in **about 7 seconds**.
 
 Quality is measured, not eyeballed: [`tools/quality_eval.py`](tools/quality_eval.py) renders the original and the result from four sides and compares shape, colour and silhouette. Version 1.5 cut the full-render error 3–4× on a stylised character and 10–40× on a metallic sculpt — see [docs/VERIFICATION.md](docs/VERIFICATION.md).
 
@@ -60,11 +60,11 @@ Original (left) vs BakeDown (right): 49,988 → 3,000 triangles, approx. distort
 
 ## What's inside
 
-- **Simplify** — real-triangle or distortion-budget target, cleanup of AI/scan meshes, planar dissolve, collapse; optional hole filling, interior-face removal, flattening, triangulation. Only the active mesh is touched.
-- **Bake** — Cycles bake of Base Color, Roughness, Metallic and tangent Normal onto a fresh UV layout at 1K/2K/4K; automatic ray distance, live normal strength, sharpening; progress, Esc to cancel, full rollback.
+- **Simplify** — real-triangle or distortion-budget target, cleanup of AI/scan meshes, edge-collapse decimation, automatic shading that matches the original; optional hole filling, interior-face removal, flattening, triangulation. Only the active mesh is touched.
+- **Bake** — Cycles bake of Base Color, Roughness, Metallic, tangent Normal and ambient occlusion onto a fresh UV layout at 1K/2K/4K; automatic ray distance, live normal strength, sharpening; progress, Esc to cancel, full rollback.
 - **LOD** — LOD0–LOD3 with Strategy / 3D Shooter / Mobile / Custom presets, one shared texture set, armature-aware, `_LOD0…3` naming for Unity LOD Groups.
 - **Rig transfer** — import a skinned FBX template and transfer armature and weights to the active mesh.
-- **Export** — Unity FBX, Unreal FBX, self-contained GLB; PNG maps next to the model, ORM packing, DirectX normal flip for Unreal.
+- **Export** — Unity FBX, Unreal FBX, self-contained GLB; PNG maps next to the model, ORM packing with real AO, glTF occlusion, DirectX normal flip for Unreal.
 - **Inspect** — Shape mode (MatCap + wireframe) and Compare original ↔ result.
 
 ## Use with AI agents

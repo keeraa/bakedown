@@ -43,6 +43,10 @@ Export with **Unity FBX** (1.3.0 or newer): it uses *FBX All* scaling and Unity'
 
 Unreal uses DirectX normal maps: enable **Flip normal-map green channel** when exporting for Unreal. Unity and glTF use OpenGL normal maps (no flip; the option is disabled for GLB).
 
+## What is the AO map for?
+
+**Bake ambient occlusion** (on by default) bakes contact shadows from the original into `<name>_AO.png`. Engines use it to darken creases and covered areas: it goes into the R channel of the ORM texture (Unreal / Unity HDRP style) and into the glTF occlusion slot. It adds about 2 seconds at 2K; switch it off in **2 — Texture → Settings** if you do not need it.
+
 ## Do LODs share the textures?
 
 Yes — LOD0–LOD3 use the same baked texture set and UVs. Objects are named `<name>_LOD0…3`, so Unity builds a LOD Group automatically. If you simplify or bake again after generating LODs, BakeDown marks them as out of date and refuses to export them until you regenerate.

@@ -231,7 +231,7 @@ def translations_complete():
         keys = {k[1] for k in table[locale]}
         for msg in sorted(used - keys):
             # internal/technical names that Blender shows untranslated anyway
-            if msg in {"LOD1", "LOD2", "LOD3", "cast_shadow", "UVMap"} or msg.startswith("BakeDown  ·"):
+            if msg in {"LOD1", "LOD2", "LOD3", "cast_shadow", "UVMap", "Occlusion"} or msg.startswith("BakeDown  ·"):
                 continue
             problems.append(f"{locale}: missing {msg!r}")
         for (_ctx, src), dst in table[locale].items():
@@ -331,7 +331,7 @@ def api_full_pipeline_headless():
     assert r["simplified"] and r["triangles"] <= 1500 and r["original_triangles"] == original
     assert r["distortion_pct"] is not None
     r = bd.bake(o, resolution=1024)                  # blocking bake, no window needed
-    assert r["baked"] and set(r["images"]) == {"BaseColor", "Rough", "Metal", "Normal"}
+    assert r["baked"] and set(r["images"]) == {"BaseColor", "Rough", "Metal", "Normal", "AO"}
     assert bd._BAKE_RUNNING is False and C.scene.bakedown.is_baking is False
     r = bd.generate_lods(o, 50, 25, None)
     assert [l["level"] for l in r["lods"]] == ["LOD0", "LOD1", "LOD2"] and r["lod_state"] == "OK"
@@ -423,6 +423,43 @@ def normal_map_repair_flattens_misses():
     assert share == 0.5, share
     assert np.allclose(out[4:7], (0.5, 0.5, 1.0), atol=0.01)       # sideways normal flattened
     assert np.allclose(out[12:15], (0.6, 0.5, 0.9), atol=0.01)     # valid normal kept
+
+
+@test
+def ambient_occlusion_map_is_baked_and_exported():
+    import json, struct
+    import numpy as np
+    fresh()
+    o = sphere("Occ", 4)
+    bd.simplify(o, triangles=600)
+    r = bd.bake(o, resolution=1024)
+    ao = bpy.data.images[r["images"]["AO"]]
+    px = np.empty(len(ao.pixels), np.float32); ao.pixels.foreach_get(px)
+    v = px.reshape(-1, 4)[:, 0]
+    used = v[v > 0.001]
+    assert 0.8 < used.mean() <= 1.0, used.mean()           # an open sphere is barely occluded
+    out = bd.export(o, os.path.join(OUT, "occ_gltf"), engine="GLTF")
+    glb = next(f for f in out["files"] if f.endswith(".glb"))
+    data = open(glb, "rb").read()
+    js = json.loads(data[20:20 + struct.unpack("<I", data[12:16])[0]])
+    assert any("occlusionTexture" in m for m in js["materials"])
+    out = bd.export(o, os.path.join(OUT, "occ_unity"), engine="UNITY", pack_orm=True)
+    names = [os.path.basename(f) for f in out["files"]]
+    assert "Occ_AO.png" in names and "Occ_ORM.png" in names, names
+    orm = bpy.data.images.load(next(f for f in out["files"] if f.endswith("_ORM.png")))
+    op = np.empty(len(orm.pixels), np.float32); orm.pixels.foreach_get(op)
+    assert op.reshape(-1, 4)[:, 0].mean() < 0.999                 # R is real AO, not constant 1
+    assert C.scene.world is None                                   # temporary AO world removed
+
+
+@test
+def bake_without_ambient_occlusion():
+    fresh()
+    o = sphere("NoOcc", 3)
+    bd.simplify(o, triangles=300)
+    r = bd.bake(o, resolution=1024, ao=False)
+    assert r["baked"] and "AO" not in r["images"]
+    assert C.scene.bakedown.bake_ao is True                        # scene default restored
 
 
 @test

@@ -23,7 +23,8 @@ Read this before changing the add-on. Section 3 lists hard-won pitfalls.
 - **1.3.0:** `_tr()` translates in the `BakeDown` context (`_I18N_CTX`); every translation is registered in both the default and the BakeDown context.
 - **1.4.0:** the bake operator is split into `_prepare()` + `invoke()` (modal, interactive) + `execute()` (blocking, for scripts / background mode).
 - **1.4.0:** public Python API at the end of the module (`process`, `simplify`, `bake`, `generate_lods`, `export`, `report`, `BakeDownError`, `API_VERSION`). It drives the operators with `EXEC_DEFAULT` and restores `scene.bakedown` through `_SceneSettings`. `tools/bakedown_cli.py` wraps it for files on disk. Keep `AGENTS.md` in sync when the API changes, and bump `API_VERSION` on breaking changes.
-- **1.5.0:** quality work driven by `tools/quality_eval.py` (see `docs/VERIFICATION.md`). Base Color is baked through `_bake_emit_socket(…, 'Base Color')` (emission reroute, like Metallic) when every high-poly material is Principled; otherwise the Diffuse Color pass is the fallback. `_choose_shading()` fits the low mesh's shading to the original's interpolated shading normals (`_normal_fit_samples` / `_normal_fit_error`, candidates `_SHADING_CANDIDATES`, tolerance `_SHADING_TOLERANCE`) and stores the result in `bakedown_shading` for LODs. `_run_to_target()` re-runs the pipeline to land within 3 % below the triangle target. `_repair_normal_map()` flattens tangent normals with z < `_NORMAL_MIN_Z`. Tunables that were measured and left off: `_AUTO_SYMMETRY`, `_UV_AVERAGE_SCALE`, `_UV_PACK`, `_UV_MARGIN_PX`.
+- **1.5.0:** quality work driven by `tools/quality_eval.py` (see `docs/VERIFICATION.md`). Base Color is baked through `_bake_emit_socket(…, 'Base Color')` (emission reroute, like Metallic) when every high-poly material is Principled; otherwise the Diffuse Color pass is the fallback. `_choose_shading()` fits the low mesh's shading to the original's interpolated shading normals (`_normal_fit_samples` / `_normal_fit_error`, candidates `_SHADING_CANDIDATES`, tolerance `_SHADING_TOLERANCE`) and stores the result in `bakedown_shading` for LODs. `_run_to_target()` re-runs the pipeline to land within 3 % below the triangle target. `_repair_normal_map()` flattens tangent normals with z < `_NORMAL_MIN_Z`. UV tunables that were measured and left at their defaults: `_UV_AVERAGE_SCALE`, `_UV_PACK`, `_UV_MARGIN_PX`.
+- **1.5.0:** optional AO pass (`_p_ao`, `_AO_SAMPLES = 8`, full resolution + `_blur_image`). AO distance is 10 % of the object size, set on the scene world for the bake (a temporary world is created when the scene has none) and restored in `_cleanup`. `_commit` wires AO into a `glTF Material Output` node group (`Occlusion` input) for glTF export; `_save_orm` puts it into the R channel. The bake signature now starts with `v15|` and records the AO flag; `_baked_with()` reads it back for reports.
 - UI source strings are English; translations are registered with `bpy.app.translations` (see section 6).
 
 ## 1. Architecture
@@ -84,7 +85,7 @@ One module, top to bottom:
 | `bakedown_result` | on the comparison object — name of the result |
 
 ### Scene settings (`context.scene.bakedown`, PropertyGroup)
-Simplify: `target_mode`, `target_faces`, `target_distortion`, `dissolve_angle`, `do_dissolve_faces`, `final_dissolve`, `fill_holes`, `remove_interior`, `planar_snap`, `triangulate_output`.
+Simplify: `target_mode`, `target_faces`, `target_distortion`, `fill_holes`, `remove_interior`, `planar_snap`, `triangulate_output`.
 Bake: `bake_resolution`, `bake_normal`, `bake_normal_strength` (live update), `bake_extrusion`, `bake_sharpen`, `is_baking` / `bake_progress` / `bake_cancel` / `bake_stage`.
 UI: `ui_mode` (STEPS / RIG / LOD), `show_adv_*`.
 LOD: `lod_preset`, `lod1/2/3_on`, `lod1/2/3_pct` (linked through update callbacks), `lod_preview`.
@@ -100,8 +101,8 @@ Rig: `rig_template` (PointerProperty to an Object).
 
 ## 3. Pitfalls (read before editing)
 
-1. **Custom split normals (e.g. Hunyuan meshes) block `dissolve_limited`.** Clear them with `customdata_custom_splitnormals_clear()` + `normals_make_consistent` **before every** dissolve.
-2. **Triangulating after dissolve inflates the count** again (n-gons → triangles). That is why `triangulate_output` is OFF by default.
+1. **Custom split normals (e.g. Hunyuan / glTF meshes) are cleared before simplification.** The original shading is not lost: `_choose_shading()` re-creates the best-matching shading afterwards.
+2. **Counts are render triangles.** `triangulate_output` is OFF by default: engines triangulate on import, and a planar dissolve after collapse was measured to only lose detail (removed in 1.5).
 3. **Bake needs `use_clear=True`**, otherwise old pixels from a previous UV layout remain.
 4. **Circular dependency while baking:** connect the target image nodes to the BSDF ONLY AFTER baking, otherwise the result is black.
 5. **Black spots after baking = ray misses.** `cage_extrusion` / `max_ray_distance` are in the mesh's LOCAL coordinates. AI imports often have scale 0.01, so the automatic distance is computed from the LOCAL size (`_bake_ray`); otherwise it is ~1/scale times too small.

@@ -44,9 +44,11 @@ report = bakedown.process(
 )
 ```
 
-Step by step: `bakedown.simplify(obj, triangles=… | distortion=…, **options)`, `bakedown.bake(obj, resolution=2048, normal_map=True, normal_strength=1.0, sharpen=0.0, ray_distance=0.0)`, `bakedown.generate_lods(obj, 50, 25, 10)`, `bakedown.export(obj, directory, engine="UNITY")`, `bakedown.report(obj)`.
+Step by step: `bakedown.simplify(obj, triangles=… | distortion=…, **options)`, `bakedown.bake(obj, resolution=2048, normal_map=True, normal_strength=1.0, sharpen=0.0, ray_distance=0.0, ao=True)`, `bakedown.generate_lods(obj, 50, 25, 10)`, `bakedown.export(obj, directory, engine="UNITY")`, `bakedown.report(obj)`.
 
-Simplify options: `dissolve_angle`, `do_dissolve_faces`, `final_dissolve`, `fill_holes`, `remove_interior`, `planar_snap`, `triangulate_output`.
+`ao=True` also bakes ambient occlusion (`images["AO"]`, ORM red channel, glTF occlusion).
+
+Simplify options: `fill_holes`, `remove_interior`, `planar_snap`, `triangulate_output`.
 
 Every function processes **one** mesh object, never modifies other objects, returns a JSON-friendly dict and raises `bakedown.BakeDownError` with a readable message on failure. Calling `simplify()` again always starts from the original backup, so it is safe to retry with other values.
 

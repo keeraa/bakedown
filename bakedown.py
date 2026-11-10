@@ -57,9 +57,6 @@ _TRANSLATIONS = {
         ("*", "LOD1 triangles as a percentage of LOD0"): "Треугольники LOD1 в % от LOD0",
         ("*", "LOD2 triangles as a percentage of LOD0"): "Треугольники LOD2 в % от LOD0",
         ("*", "LOD3 triangles as a percentage of LOD0"): "Треугольники LOD3 в % от LOD0",
-        ("*", "Dissolve angle"): "Угол Dissolve",
-        ("*", "Merge near-planar faces before collapse"): "Сливать плоские грани до коллапса",
-        ("*", "Final Limited Dissolve"): "Финальный Limited Dissolve",
         ("*", "Fill holes"): "Заполнять дыры",
         ("*", "Remove interior faces"): "Удалять внутренние грани",
         ("*", "Triangulate output"): "Триангулировать результат",
@@ -158,9 +155,6 @@ _TRANSLATIONS = {
 _TRANSLATIONS["ru_RU"].update({
     ("*", "Interface"): "Интерфейс",
     ("*", "Custom"): "Свой",
-    ("*", "Angle threshold for merging near-planar faces. Higher values are more aggressive and may smooth small details."): "Порог угла для слияния почти плоских граней. Большие значения работают агрессивнее и могут сгладить мелкие детали.",
-    ("*", "Merge near-planar faces before the collapse decimation pass"): "Слить почти плоские грани до прохода Collapse Decimate.",
-    ("*", "Run one more planar cleanup pass after collapse"): "Выполнить ещё один проход очистки плоских участков после Collapse.",
     ("*", "Close holes after simplification; intentional openings may also be filled"): "Закрыть отверстия после упрощения; намеренные проёмы тоже могут быть заполнены.",
     ("*", "Use Blender's interior-face detector before simplification. Review the result because complex meshes may be misclassified."): "Использовать детектор внутренних граней Blender до упрощения. Проверяйте результат: сложные меши могут быть распознаны неверно.",
     ("*", "Convert the final mesh to explicit triangles. Triangle statistics are always calculated from the render triangulation, even when this is off."): "Преобразовать финальный меш в явные треугольники. Статистика всегда считается по рендер-триангуляции, даже когда опция выключена.",
@@ -228,9 +222,6 @@ _ES = {
     "LOD1 triangles as a percentage of LOD0": "Triángulos de LOD1 en % de LOD0",
     "LOD2 triangles as a percentage of LOD0": "Triángulos de LOD2 en % de LOD0",
     "LOD3 triangles as a percentage of LOD0": "Triángulos de LOD3 en % de LOD0",
-    "Dissolve angle": "Ángulo de disolución",
-    "Merge near-planar faces before collapse": "Fusionar caras casi planas antes del colapso",
-    "Final Limited Dissolve": "Limited Dissolve final",
     "Fill holes": "Rellenar agujeros",
     "Remove interior faces": "Eliminar caras interiores",
     "Triangulate output": "Triangular el resultado",
@@ -325,9 +316,6 @@ _ES = {
     "Required exporter is unavailable": "El exportador necesario no está disponible",
     "Interface": "Interfaz",
     "Custom": "Personalizado",
-    "Angle threshold for merging near-planar faces. Higher values are more aggressive and may smooth small details.": "Umbral de ángulo para fusionar caras casi planas. Valores altos son más agresivos y pueden suavizar detalles pequeños.",
-    "Merge near-planar faces before the collapse decimation pass": "Fusionar caras casi planas antes del paso de diezmado Collapse",
-    "Run one more planar cleanup pass after collapse": "Ejecutar otra pasada de limpieza de zonas planas tras el colapso",
     "Close holes after simplification; intentional openings may also be filled": "Cerrar agujeros tras la simplificación; también pueden rellenarse aberturas intencionadas",
     "Use Blender's interior-face detector before simplification. Review the result because complex meshes may be misclassified.": "Usar el detector de caras interiores de Blender antes de simplificar. Revisa el resultado: las mallas complejas pueden clasificarse mal.",
     "Convert the final mesh to explicit triangles. Triangle statistics are always calculated from the render triangulation, even when this is off.": "Convertir la malla final en triángulos explícitos. Las estadísticas siempre se calculan con la triangulación de render, aunque esté desactivado.",
@@ -390,9 +378,6 @@ _DE = {
     "LOD1 triangles as a percentage of LOD0": "LOD1-Dreiecke in % von LOD0",
     "LOD2 triangles as a percentage of LOD0": "LOD2-Dreiecke in % von LOD0",
     "LOD3 triangles as a percentage of LOD0": "LOD3-Dreiecke in % von LOD0",
-    "Dissolve angle": "Dissolve-Winkel",
-    "Merge near-planar faces before collapse": "Fast ebene Flächen vor dem Collapse zusammenführen",
-    "Final Limited Dissolve": "Abschließendes Limited Dissolve",
     "Fill holes": "Löcher füllen",
     "Remove interior faces": "Innenflächen entfernen",
     "Triangulate output": "Ergebnis triangulieren",
@@ -487,9 +472,6 @@ _DE = {
     "Required exporter is unavailable": "Benötigter Exporter ist nicht verfügbar",
     "Interface": "Oberfläche",
     "Custom": "Eigene",
-    "Angle threshold for merging near-planar faces. Higher values are more aggressive and may smooth small details.": "Winkelschwelle zum Zusammenführen fast ebener Flächen. Höhere Werte sind aggressiver und können kleine Details glätten.",
-    "Merge near-planar faces before the collapse decimation pass": "Fast ebene Flächen vor dem Collapse-Decimate-Durchgang zusammenführen",
-    "Run one more planar cleanup pass after collapse": "Nach dem Collapse einen weiteren Bereinigungsdurchgang für ebene Bereiche ausführen",
     "Close holes after simplification; intentional openings may also be filled": "Löcher nach der Vereinfachung schließen; gewollte Öffnungen können ebenfalls gefüllt werden",
     "Use Blender's interior-face detector before simplification. Review the result because complex meshes may be misclassified.": "Blenders Innenflächen-Erkennung vor der Vereinfachung nutzen. Ergebnis prüfen: komplexe Meshes können falsch erkannt werden.",
     "Convert the final mesh to explicit triangles. Triangle statistics are always calculated from the render triangulation, even when this is off.": "Endgültiges Mesh in explizite Dreiecke umwandeln. Die Statistik nutzt immer die Render-Triangulierung, auch wenn dies aus ist.",
@@ -552,9 +534,6 @@ _ZH = {
     "LOD1 triangles as a percentage of LOD0": "LOD1 三角面数占 LOD0 的百分比",
     "LOD2 triangles as a percentage of LOD0": "LOD2 三角面数占 LOD0 的百分比",
     "LOD3 triangles as a percentage of LOD0": "LOD3 三角面数占 LOD0 的百分比",
-    "Dissolve angle": "融并角度",
-    "Merge near-planar faces before collapse": "塌陷前合并近似平面",
-    "Final Limited Dissolve": "最终有限融并",
     "Fill holes": "填充孔洞",
     "Remove interior faces": "删除内部面",
     "Triangulate output": "三角化结果",
@@ -649,9 +628,6 @@ _ZH = {
     "Required exporter is unavailable": "所需的导出器不可用",
     "Interface": "界面",
     "Custom": "自定义",
-    "Angle threshold for merging near-planar faces. Higher values are more aggressive and may smooth small details.": "合并近似平面的角度阈值。数值越大简化越激进，可能抹平细小细节。",
-    "Merge near-planar faces before the collapse decimation pass": "在塌陷精简之前合并近似平面",
-    "Run one more planar cleanup pass after collapse": "塌陷后再执行一次平面清理",
     "Close holes after simplification; intentional openings may also be filled": "简化后封闭孔洞；有意保留的开口也可能被填充",
     "Use Blender's interior-face detector before simplification. Review the result because complex meshes may be misclassified.": "简化前使用 Blender 的内部面检测。请检查结果：复杂网格可能被误判。",
     "Convert the final mesh to explicit triangles. Triangle statistics are always calculated from the render triangulation, even when this is off.": "将最终网格转换为显式三角面。即使关闭此项，统计也始终按渲染三角化计算。",
@@ -703,6 +679,24 @@ _NEW_1_3 = {
         "es": "La plantilla no tiene modificador Armature ni padre esqueleto; se usa el único esqueleto de la escena: {}",
         "de_DE": "Die Vorlage hat keinen Armature-Modifier oder Skelett-Parent; das einzige Skelett der Szene wird verwendet: {}",
         "zh_HANS": "模板没有骨架修改器或骨架父级；已使用场景中唯一的骨架：{}",
+    },
+    "Bake ambient occlusion": {
+        "ru_RU": "Запекать ambient occlusion",
+        "es": "Hornear oclusión ambiental",
+        "de_DE": "Umgebungsverdeckung backen",
+        "zh_HANS": "烘焙环境光遮蔽",
+    },
+    "Bake an ambient occlusion map from the original. Used as the AO channel of the ORM texture and as the glTF occlusion map": {
+        "ru_RU": "Запечь карту ambient occlusion с оригинала. Используется как канал AO в текстуре ORM и как карта occlusion в glTF",
+        "es": "Hornea un mapa de oclusión ambiental desde el original. Se usa como canal AO de la textura ORM y como mapa de oclusión de glTF",
+        "de_DE": "Eine Ambient-Occlusion-Map vom Original backen. Wird als AO-Kanal der ORM-Textur und als glTF-Occlusion-Map verwendet",
+        "zh_HANS": "从原始模型烘焙环境光遮蔽贴图，用作 ORM 纹理的 AO 通道和 glTF 遮蔽贴图",
+    },
+    "Ambient occlusion": {
+        "ru_RU": "Ambient occlusion",
+        "es": "Oclusión ambiental",
+        "de_DE": "Umgebungsverdeckung",
+        "zh_HANS": "环境光遮蔽",
     },
     "Weight smoothing failed: {}": {
         "ru_RU": "Сглаживание весов не удалось: {}",
@@ -1287,17 +1281,20 @@ def _update_lod_custom(self, context):
 
 def _bake_sig(o, pg):
     """Bake inputs that actually require new pixels. Normal strength is live-only."""
-    return "|".join([
+    return "v15|" + "|".join([
         str(o.get("bakedown_geo_version", 0)),
         pg.bake_resolution,
         "1" if pg.bake_normal else "0",
         f"{pg.bake_extrusion:.4f}",
         f"{pg.bake_sharpen:.3f}",
+        "1" if pg.bake_ao else "0",
     ])
 
 
 def _normalize_stored_bake_sig(signature):
     """Accept the v1.2 signature that contained live normal strength."""
+    if str(signature or "").startswith("v15|"):
+        return str(signature)
     parts = str(signature or "").split("|")
     if len(parts) == 6:
         del parts[3]
@@ -1311,6 +1308,33 @@ def _bake_assets_exist(o, pg):
     required = ["BaseColor", "Rough", "Metal"]
     if pg.bake_normal:
         required.append("Normal")
+    if pg.bake_ao:
+        required.append("AO")
+    return all(_baked_image(o, suffix) is not None for suffix in required)
+
+
+def _baked_with(o):
+    """Which optional maps the last bake produced, read from its signature."""
+    sig = str(o.get("bakedown_baked_sig") or "")
+    if not sig:
+        return None
+    parts = sig.split("|")
+    if parts[0] == "v15" and len(parts) >= 7:
+        return {"normal": parts[3] == "1", "ao": parts[6] == "1"}
+    parts = _normalize_stored_bake_sig(sig).split("|")
+    return {"normal": len(parts) > 2 and parts[2] == "1", "ao": False}
+
+
+def _baked_assets_complete(o):
+    """True when the material and every map of the last bake still exist."""
+    flags = _baked_with(o)
+    if flags is None:
+        return False
+    material_name = o.get("bakedown_material_name")
+    if not material_name or bpy.data.materials.get(material_name) is None:
+        return False
+    required = ["BaseColor", "Rough", "Metal"] + (["Normal"] if flags["normal"] else []) \
+        + (["AO"] if flags["ao"] else [])
     return all(_baked_image(o, suffix) is not None for suffix in required)
 
 
@@ -1373,16 +1397,6 @@ class BakeDownSettings(bpy.types.PropertyGroup):
     lod3_pct: bpy.props.FloatProperty(
         name="LOD3", default=10.0, min=1.0, max=100.0, subtype='PERCENTAGE',
         update=_update_lod_custom, description="LOD3 triangles as a percentage of LOD0")
-    dissolve_angle: bpy.props.FloatProperty(
-        name="Dissolve angle", default=8.0, min=0.0, max=45.0,
-        description=("Angle threshold for merging near-planar faces. Higher values are "
-                     "more aggressive and may smooth small details."))
-    do_dissolve_faces: bpy.props.BoolProperty(
-        name="Merge near-planar faces before collapse", default=True,
-        description="Merge near-planar faces before the collapse decimation pass")
-    final_dissolve: bpy.props.BoolProperty(
-        name="Final Limited Dissolve", default=False,
-        description="Run one more planar cleanup pass after collapse")
     fill_holes: bpy.props.BoolProperty(
         name="Fill holes", default=False,
         description="Close holes after simplification; intentional openings may also be filled")
@@ -1404,6 +1418,10 @@ class BakeDownSettings(bpy.types.PropertyGroup):
     bake_normal: bpy.props.BoolProperty(
         name="Bake a normal map", default=True,
         description="Restore high-poly surface detail with a tangent-space normal map")
+    bake_ao: bpy.props.BoolProperty(
+        name="Bake ambient occlusion", default=True,
+        description=("Bake an ambient occlusion map from the original. Used as the AO channel "
+                     "of the ORM texture and as the glTF occlusion map"))
     bake_normal_strength: bpy.props.FloatProperty(
         name="Normal strength", default=1.0, min=0.0, max=2.0,
         update=_update_normal_strength,
@@ -1483,43 +1501,12 @@ def _evaluated_mesh_with_only_modifier(context, obj, modifier):
         context.view_layer.update()
 
 
-_AUTO_SYMMETRY = False  # measured: no fidelity gain (tools/quality_eval.py); kept as a switch
-
-
-def _symmetry_axis(mesh, tolerance=0.002):
-    """Local axis ('X', 'Y' or 'Z') across which the mesh is mirror-symmetric about its
-    bounding-box centre, or None. 97 % of sampled vertices must have a mirrored partner
-    on the surface within `tolerance` × object size."""
-    import numpy as np
-    from mathutils import Matrix, Vector
-    n = len(mesh.vertices)
-    if n < 8:
-        return None
-    co = np.empty(n * 3); mesh.vertices.foreach_get("co", co); co = co.reshape(-1, 3)
-    lo, hi = co.min(0), co.max(0)
-    center, size = (lo + hi) / 2, float(np.linalg.norm(hi - lo)) or 1.0
-    sample = co[np.linspace(0, n - 1, min(n, 3000)).astype(np.int64)]
-    tree = _mesh_bvh_world(mesh, Matrix.Identity(4))
-    best = None
-    for axis, i in (('X', 0), ('Y', 1), ('Z', 2)):
-        m = sample.copy()
-        m[:, i] = 2 * center[i] - m[:, i]
-        dist = [tree.find_nearest(Vector(p))[3] for p in m]
-        d = np.array([size if x is None else x for x in dist]) / size
-        share = float((d < tolerance).mean())
-        if share >= 0.97 and (best is None or share > best[1]):
-            best = (axis, share)
-    return best[0] if best else None
-
-
 def _run_pipeline(context, o, target, pg):
     """One simplification FROM THE BACKUP down to `target` triangles + distortion measurement."""
     _ensure_backup(o)
     if o.mode != 'OBJECT':
         bpy.ops.object.mode_set(mode='OBJECT')
     _restore_from_backup(o)
-    delimit = {'NORMAL', 'MATERIAL'}
-    ang = math.radians(pg.dissolve_angle)
     bpy.ops.object.select_all(action='DESELECT')
     o.select_set(True)
     context.view_layer.objects.active = o
@@ -1537,8 +1524,6 @@ def _run_pipeline(context, o, target, pg):
         bpy.ops.mesh.select_interior_faces()
         bpy.ops.mesh.delete(type='FACE')
         bpy.ops.mesh.select_all(action='SELECT')
-    if pg.do_dissolve_faces:
-        bpy.ops.mesh.dissolve_limited(angle_limit=ang, delimit=delimit)
     bpy.ops.object.mode_set(mode='OBJECT')
     cur = _triangle_count_object(o)
     if cur > target:
@@ -1546,11 +1531,6 @@ def _run_pipeline(context, o, target, pg):
         mod = o.modifiers.new("BakeDownCollapse", 'DECIMATE')
         mod.decimate_type = 'COLLAPSE'
         mod.ratio = ratio
-        if _AUTO_SYMMETRY:
-            axis = _symmetry_axis(o.data)
-            if axis is not None:
-                mod.use_symmetry = True
-                mod.symmetry_axis = axis
         new_me = _evaluated_mesh_with_only_modifier(context, o, mod)
         old = o.data
         o.data = new_me
@@ -1564,8 +1544,6 @@ def _run_pipeline(context, o, target, pg):
     bpy.ops.mesh.normals_make_consistent(inside=False)
     if pg.fill_holes:
         bpy.ops.mesh.fill_holes(sides=0)
-    if pg.final_dissolve:
-        bpy.ops.mesh.dissolve_limited(angle_limit=ang, delimit=delimit)
     if pg.triangulate_output:
         bpy.ops.mesh.quads_convert_to_tris(quad_method='BEAUTY', ngon_method='BEAUTY')
     bpy.ops.mesh.normals_make_consistent(inside=False)
@@ -1577,7 +1555,7 @@ def _run_pipeline(context, o, target, pg):
 
 def _run_to_target(context, o, target, pg, tries=4):
     """Run the pipeline so the result uses the triangle budget: cleanup and the final
-    dissolve remove extra triangles, so a plain ratio lands well below the target.
+    removes triangles too (welds, loose parts), so a plain ratio lands below the target.
     Re-runs from the backup with a corrected request and keeps the best result that
     does not exceed the target."""
     request = target
@@ -2044,6 +2022,43 @@ def _repair_normal_map(im, min_z=None):
         return 0.0
 
 
+_AO_SAMPLES = 8      # full resolution + light blur; measured vs a 64-sample reference
+
+
+def _blur_image(im, passes=1):
+    """Edge-padded 5-tap box blur of the RGB channels (denoises the AO bake)."""
+    if im is None or passes <= 0:
+        return
+    try:
+        import numpy as np
+        w, h = im.size
+        px = np.empty(w * h * 4, dtype=np.float32)
+        im.pixels.foreach_get(px)
+        rgba = px.reshape(h, w, 4)
+        rgb = rgba[:, :, :3]
+        for _ in range(passes):
+            p = np.pad(rgb, ((1, 1), (1, 1), (0, 0)), mode='edge')
+            rgb = (p[1:-1, 1:-1] + p[:-2, 1:-1] + p[2:, 1:-1] + p[1:-1, :-2] + p[1:-1, 2:]) / 5.0
+        rgba[:, :, :3] = rgb
+        im.pixels.foreach_set(rgba.reshape(-1))
+        im.update()
+    except Exception:
+        pass
+
+
+def _gltf_output_group():
+    """The custom node group Blender's glTF exporter reads the occlusion map from."""
+    name = "glTF Material Output"
+    group = bpy.data.node_groups.get(name)
+    if group is not None and group.bl_idname == 'ShaderNodeTree':
+        if any(getattr(i, "name", "") == "Occlusion" for i in group.interface.items_tree):
+            return group
+    group = bpy.data.node_groups.new(name, 'ShaderNodeTree')
+    group.interface.new_socket(name="Occlusion", in_out='INPUT', socket_type='NodeSocketFloat')
+    group.nodes.new("NodeGroupInput")
+    return group
+
+
 def _sharpen_image(im, amount):
     """Unsharp mask on albedo: result = orig + amount·(orig − blur)."""
     if im is None or amount <= 0.0:
@@ -2153,7 +2168,7 @@ class OBJECT_OT_bakedown_bake(bpy.types.Operator):
         self._previous_material_name = lo.get("bakedown_material_name")
         self._previous_image_names = {
             suffix: lo.get(f"bakedown_image_{suffix}")
-            for suffix in ("BaseColor", "Rough", "Metal", "Normal")
+            for suffix in ("BaseColor", "Rough", "Metal", "Normal", "AO")
         }
         self._nstr = pg.bake_normal_strength
         self._committed = False
@@ -2193,6 +2208,9 @@ class OBJECT_OT_bakedown_bake(bpy.types.Operator):
             self.img_rough = _img("Rough", True)
             self.img_metal = _img("Metal", True)
             self.img_norm = _img("Normal", True) if pg.bake_normal else None
+            # Full resolution: half-res AO + upscale was measured 2.6x less accurate
+            # (UV island borders bleed into the background).
+            self.img_ao = _img("AO", True) if pg.bake_ao else None
 
             self.hi = bpy.data.objects.new(f"__bakedown_hipoly_{token}", bm)
             context.scene.collection.objects.link(self.hi)
@@ -2221,6 +2239,11 @@ class OBJECT_OT_bakedown_bake(bpy.types.Operator):
                 self.n_norm = nt.nodes.new("ShaderNodeTexImage"); self.n_norm.location = (-450, -550)
                 self.n_norm.image = self.img_norm
                 self.n_norm.interpolation = 'Linear'
+            self.n_ao = None
+            if self.img_ao is not None:
+                self.n_ao = nt.nodes.new("ShaderNodeTexImage"); self.n_ao.location = (-450, -850)
+                self.n_ao.image = self.img_ao
+                self.n_ao.interpolation = 'Linear'
             self._slot_state = [(s.link, s.material) for s in lo.material_slots]
             lo.data.materials.clear()
             lo.data.materials.append(self.mat)
@@ -2244,13 +2267,22 @@ class OBJECT_OT_bakedown_bake(bpy.types.Operator):
             b.cage_extrusion = extrusion
             b.max_ray_distance = raydist
             b.margin = max(4, res // 512)
+            if self.img_ao is not None:
+                # AO reach ~10 % of the object size, in world units
+                self._ao_world = (scn.world is None, scn.world,
+                                  scn.world.light_settings.distance if scn.world else None)
+                if scn.world is None:
+                    scn.world = bpy.data.worlds.new("__BakeDownAOWorld")
+                scn.world.light_settings.distance = max(1e-4, lo.dimensions.length * 0.1)
 
             self._passes = [(_tr("Base Color"), self._p_diffuse),
                             (_tr("Roughness"), self._p_rough)]
             if self.n_norm is not None:
                 self._passes.append((_tr("Normals"), self._p_normal))
+            if self.n_ao is not None:
+                self._passes.append((_tr("Ambient occlusion"), self._p_ao))
             self._passes.append((_tr("Metallic"), self._p_metal))
-            for im in (self.img_base, self.img_rough, self.img_metal, self.img_norm):
+            for im in (self.img_base, self.img_rough, self.img_metal, self.img_norm, self.img_ao):
                 if im is not None:
                     self._passes.append((_tr("Packing"),
                                          (lambda image: (lambda _ctx: self._p_pack(image)))(im)))
@@ -2358,6 +2390,16 @@ class OBJECT_OT_bakedown_bake(bpy.types.Operator):
         self._do_bake(context, self.n_norm, 'NORMAL', normal_space='TANGENT')
         self._normal_repaired = _repair_normal_map(self.img_norm)
 
+    def _p_ao(self, context):
+        cycles = context.scene.cycles
+        old = cycles.samples
+        cycles.samples = _AO_SAMPLES
+        try:
+            self._do_bake(context, self.n_ao, 'AO')
+        finally:
+            cycles.samples = old
+        _blur_image(self.img_ao, passes=1)              # remove sampling noise
+
     def _p_metal(self, context):
         self._bake_emit_socket(context, self.n_met, 'Metallic')
 
@@ -2417,6 +2459,16 @@ class OBJECT_OT_bakedown_bake(bpy.types.Operator):
             nmap.inputs['Strength'].default_value = self._nstr
             nt.links.new(self.n_norm.outputs['Color'], nmap.inputs['Color'])
             nt.links.new(nmap.outputs['Normal'], self.bsdf.inputs['Normal'])
+        if self.n_ao is not None:
+            # glTF exporters read occlusion from a "glTF Material Output" group
+            group = nt.nodes.new("ShaderNodeGroup")
+            group.node_tree = _gltf_output_group()
+            group.location = (350, -500)
+            sep = nt.nodes.new("ShaderNodeSeparateColor")
+            sep.location = (100, -850)
+            nt.links.new(self.n_ao.outputs['Color'], sep.inputs['Color'])
+            nt.links.new(sep.outputs['Red'], group.inputs['Occlusion'])
+        nt.nodes.active = self.n_base      # Solid > Texture view shows the colour map
 
         for im in self._temp_images:
             desired = self._image_targets[im.name]
@@ -2528,6 +2580,20 @@ class OBJECT_OT_bakedown_bake(bpy.types.Operator):
             self.hi = None
 
         _restore_render_state(context.scene, getattr(self, '_render_state', None))
+        ao_world = getattr(self, '_ao_world', None)
+        if ao_world is not None:
+            created, world, distance = ao_world
+            try:
+                if created:
+                    temp = context.scene.world
+                    context.scene.world = None
+                    if temp is not None and temp.users == 0:
+                        bpy.data.worlds.remove(temp)
+                elif world is not None:
+                    world.light_settings.distance = distance
+            except Exception:
+                pass
+            self._ao_world = None
         _restore_viewport_state(context, getattr(self, '_viewport_state', None))
         _reset_bake_ui_state(pg)
         wm = context.window_manager
@@ -2698,7 +2764,7 @@ class OBJECT_OT_bakedown_export(bpy.types.Operator):
                 self.report({'WARNING'}, _tr("glTF requires OpenGL normal maps; the green channel was not flipped"))
             found_images = []
             if self.save_textures:
-                for suffix in ("BaseColor", "Rough", "Metal", "Normal"):
+                for suffix in ("BaseColor", "Rough", "Metal", "Normal", "AO"):
                     image = _baked_image(base_obj, suffix)
                     if image is None:
                         continue
@@ -2793,6 +2859,11 @@ class OBJECT_OT_bakedown_export(bpy.types.Operator):
         rough.pixels.foreach_get(r)
         metal.pixels.foreach_get(m)
         orm = np.ones_like(r)
+        ao = _baked_image(base_obj, "AO")
+        if ao is not None and ao.size[:] == rough.size[:]:
+            a = np.empty(len(ao.pixels), dtype=np.float32)
+            ao.pixels.foreach_get(a)
+            orm[0::4] = a[0::4]
         orm[1::4] = r[0::4]
         orm[2::4] = m[0::4]
         orm[3::4] = 1.0
@@ -3367,10 +3438,7 @@ class VIEW3D_PT_bakedown(bpy.types.Panel):
             if pg.show_adv_decimate:
                 c = b1.column(align=True)
                 c.prop(pg, 'remove_interior')
-                c.prop(pg, 'dissolve_angle')
-                c.prop(pg, 'do_dissolve_faces')
                 c.prop(pg, 'fill_holes')
-                c.prop(pg, 'final_dissolve')
                 c.prop(pg, 'planar_snap')
                 c.prop(pg, 'triangulate_output')
             self._draw_target(b1, pg)
@@ -3395,6 +3463,7 @@ class VIEW3D_PT_bakedown(bpy.types.Panel):
                 if pg.bake_normal:
                     c.prop(pg, 'bake_normal_strength', slider=True)
                 c.prop(pg, 'bake_normal')
+                c.prop(pg, 'bake_ao')
             if pg.is_baking and _BAKE_RUNNING:
                 b2.progress(factor=pg.bake_progress,
                             text=f"{pg.bake_stage}… {int(pg.bake_progress * 100)}%")
@@ -3436,8 +3505,7 @@ class BakeDownError(RuntimeError):
     """Raised by the BakeDown API when an operation cannot be completed."""
 
 
-_SIMPLIFY_OPTIONS = ("dissolve_angle", "do_dissolve_faces", "final_dissolve", "fill_holes",
-                     "remove_interior", "planar_snap", "triangulate_output")
+_SIMPLIFY_OPTIONS = ("fill_holes", "remove_interior", "planar_snap", "triangulate_output")
 _ENGINES = {"UNITY": "UNITY", "UNREAL": "UNREAL", "GLTF": "GLTF", "GLB": "GLTF"}
 
 
@@ -3520,7 +3588,7 @@ def report(obj):
     lods = ([ob for ob in coll.objects if ob.get("bakedown_lod_of") == base.name]
             if coll is not None else [])
     images = {}
-    for suffix in ("BaseColor", "Rough", "Metal", "Normal"):
+    for suffix in ("BaseColor", "Rough", "Metal", "Normal", "AO"):
         image = _baked_image(base, suffix)
         if image is not None:
             images[suffix] = image.name
@@ -3534,7 +3602,7 @@ def report(obj):
         "simplified": bool(base.get("bakedown_simplified")),
         "distortion_mm": base.get("bakedown_distort_mm"),
         "distortion_pct": base.get("bakedown_distort_pct"),
-        "baked": bool(base.get("bakedown_baked_sig")) and _bake_assets_exist(base, bpy.context.scene.bakedown),
+        "baked": _baked_assets_complete(base),
         "material": base.get("bakedown_material_name"),
         "images": images,
         "lods": [{"name": ob.name, "level": ob.get("bakedown_lod_level"),
@@ -3547,8 +3615,8 @@ def report(obj):
 
 def simplify(obj, triangles=None, distortion=None, **options):
     """Simplify one mesh. Give `triangles` (target count) or `distortion` (budget in %
-    of object size). Extra options: dissolve_angle, do_dissolve_faces, final_dissolve,
-    fill_holes, remove_interior, planar_snap, triangulate_output."""
+    of object size). Extra options: fill_holes, remove_interior, planar_snap,
+    triangulate_output."""
     obj = _api_object(obj)
     if (triangles is None) == (distortion is None):
         raise BakeDownError("Pass exactly one of triangles= or distortion=")
@@ -3567,7 +3635,7 @@ def simplify(obj, triangles=None, distortion=None, **options):
 
 
 def bake(obj, resolution=2048, normal_map=True, normal_strength=1.0,
-         sharpen=0.0, ray_distance=0.0):
+         sharpen=0.0, ray_distance=0.0, ao=True):
     """Bake Base Color, Roughness, Metallic (and Normal) from the original onto the
     simplified mesh. Blocking; uses Cycles on the CPU."""
     obj = _api_object(obj)
@@ -3578,7 +3646,8 @@ def bake(obj, resolution=2048, normal_map=True, normal_strength=1.0,
     _api_activate(obj)
     with _SceneSettings(bpy.context.scene, bake_resolution=str(int(resolution)),
                         bake_normal=bool(normal_map), bake_normal_strength=float(normal_strength),
-                        bake_sharpen=float(sharpen), bake_extrusion=float(ray_distance)):
+                        bake_sharpen=float(sharpen), bake_extrusion=float(ray_distance),
+                        bake_ao=bool(ao)):
         _api_call(bpy.ops.object.bakedown_bake)
     return report(obj)
 

@@ -11,14 +11,23 @@ Quality release. Every change was measured with the new `tools/quality_eval.py` 
 - **Full triangle budget.** Simplify re-runs from the backup with a corrected request until the result lands within 3 % below the target (3,000 instead of 2,734).
 - **Normal strength defaults to 1.0** (was 0.5, which removed half of the baked relief). Full-render error on the sculpt 3.5 → 1.0 px.
 - **Normal-map repair.** Texels whose tangent normal points sideways or backwards (rays that hit a neighbouring layer) are replaced with a flat normal.
-- **Final Limited Dissolve is off by default** — after the budget is reached it only removed detail (mean surface error −34 % on the test character).
+- **No planar dissolve after collapse** — after the budget is reached it only removed detail (mean surface error −34 % on the test character).
 
 Overall full-render error vs 1.4.1: character 7.4 → 1.9 px at 3k triangles, sculpt 21.1 → 0.8 px.
 
+### Added
+
+- **Ambient occlusion map** (on by default, **Bake ambient occlusion**): baked from the original at full resolution with 8 samples and a light denoise (measured against a 64-sample reference; half-resolution baking was 2.6× less accurate at UV borders). Saved as `<name>_AO.png`, used as the R channel of the ORM texture (it used to be constant white) and exported as the glTF occlusion map. API: `bake(..., ao=True)`.
+
+### Removed
+
+- **Merge near-planar faces before collapse**, **Final Limited Dissolve** and **Dissolve angle**: measured on a character, a sculpt and a planar building model — the first had no effect, the second only removed detail.
+- The outdated 40-second demo video (it showed v1.2.2); the README uses the 1.5.0 hero GIF.
+
 ### Fixed
 
+- API `report()["baked"]` follows the maps the last bake actually produced instead of the current scene settings.
 - API: `bake(normal_strength=…)` was reset to the scene value when the API restored settings.
-- Symmetry detection treated an exact mirror match (distance 0) as a miss. Automatic symmetric decimation is available as an internal switch but stays off: it did not improve fidelity.
 
 ### Documentation
 

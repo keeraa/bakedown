@@ -17,7 +17,7 @@
 
 **−94 % de triángulos · el mismo aspecto · texturas PBR horneadas en segundos**
 
-[**⬇ Descargar**](https://github.com/keeraa/bakedown/releases/latest) · [▶ Demo de 40 segundos](docs/media/bakedown_demo.mp4) · [🤖 Para agentes de IA](AGENTS.md) · [❓ Preguntas frecuentes](docs/FAQ.md)
+[**⬇ Descargar**](https://github.com/keeraa/bakedown/releases/latest) · [🤖 Para agentes de IA](AGENTS.md) · [❓ Preguntas frecuentes](docs/FAQ.md)
 
 </div>
 
@@ -40,12 +40,12 @@ Personajes: **Simplificar → Hornear → Rig → LOD → Exportar** (los LOD cr
 | Conservar el original y deshacerlo todo | duplicar y controlarlo tú | ✅ copia automática, **Restablecer** con un clic |
 | Elegir el resultado | adivinar el ratio de Decimate | ✅ objetivo en triángulos **o** en error de forma permitido, en mm y % |
 | Limpiar mallas de IA o escaneos | soldar, sueltos, normales, split normals a mano | ✅ integrado en **Simplificar** |
-| Mantener el aspecto | configurar 4 horneados selected-to-active, UV y materiales | ✅ Base Color, Roughness, Metallic y Normal en un clic, reversión al cancelar |
+| Mantener el aspecto | configurar 5 horneados selected-to-active, UV y materiales | ✅ Base Color, Roughness, Metallic, Normal y AO en un clic, reversión al cancelar |
 | LOD | duplicar, diezmar, reasignar rig, renombrar | ✅ preajustes LOD0–LOD3, texturas compartidas, esqueleto incluido, aviso de LOD desactualizados |
 | Exportar al motor | recordar ejes, escala, suavizado, formato de normales | ✅ preajustes Unity / Unreal / glTF |
 | Automatización | escribir y depurar scripts `bpy` | ✅ API de Python y línea de comandos con informe JSON |
 
-Un personaje de 50.000 triángulos pasa a 3.000 con horneado PBR 2K, cuatro LOD y un FBX para Unity en **unos 5 segundos**.
+Un personaje de 50.000 triángulos pasa a 3.000 con horneado PBR 2K, cuatro LOD y un FBX para Unity en **unos 7 segundos**.
 
 La calidad se mide, no se estima a ojo: [`tools/quality_eval.py`](tools/quality_eval.py) renderiza el original y el resultado desde cuatro lados y compara forma, color y silueta. La versión 1.5 redujo el error del render completo de 3 a 4 veces en un personaje estilizado y de 10 a 40 veces en una escultura metálica; detalles en [docs/VERIFICATION.md](docs/VERIFICATION.md).
 
@@ -60,11 +60,11 @@ Original (izquierda) frente a BakeDown (derecha): 49.988 → 3.000 triángulos, 
 
 ## Qué incluye
 
-- **Simplificar** — objetivo en triángulos reales o en margen de distorsión, limpieza de mallas de IA y escaneos, disolución de caras planas, colapso; opcionalmente relleno de agujeros, eliminación de caras interiores, aplanado y triangulación. Solo se modifica la malla activa.
-- **Hornear** — horneado en Cycles de Base Color, Roughness, Metallic y Normal tangente sobre un nuevo despliegue UV a 1K/2K/4K; distancia de rayo automática, intensidad de normales en vivo, nitidez; progreso, Esc para cancelar, reversión completa.
+- **Simplificar** — objetivo en triángulos reales o en margen de distorsión, limpieza de mallas de IA y escaneos, colapso de aristas, sombreado automático igual al original; opcionalmente relleno de agujeros, eliminación de caras interiores, aplanado y triangulación. Solo se modifica la malla activa.
+- **Hornear** — horneado en Cycles de Base Color, Roughness, Metallic, Normal tangente y oclusión ambiental sobre un nuevo despliegue UV a 1K/2K/4K; distancia de rayo automática, intensidad de normales en vivo, nitidez; progreso, Esc para cancelar, reversión completa.
 - **LOD** — LOD0–LOD3 con preajustes Estrategia / Shooter 3D / Móvil / Personalizado, un único juego de texturas, compatible con esqueletos, nombres `_LOD0…3` para LOD Groups de Unity.
 - **Transferencia de rig** — importa una plantilla FBX con skinning y transfiere esqueleto y pesos a la malla activa.
-- **Exportar** — FBX para Unity, FBX para Unreal, GLB autónomo; mapas PNG junto al modelo, empaquetado ORM, normales en formato DirectX para Unreal.
+- **Exportar** — FBX para Unity, FBX para Unreal, GLB autónomo; mapas PNG junto al modelo, empaquetado ORM con AO real, oclusión glTF, normales en formato DirectX para Unreal.
 - **Inspeccionar** — modo Forma (MatCap + malla de alambre) y Comparar original ↔ resultado.
 
 ## Uso con agentes de IA

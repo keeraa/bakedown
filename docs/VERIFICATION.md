@@ -2,7 +2,7 @@
 
 ## Automated (headless Blender)
 
-`tests/run_tests.py` — **25/25 PASS** on Blender **5.1.2** and **4.5.0** (macOS):
+`tests/run_tests.py` — **27/27 PASS** on Blender **5.1.2** and **4.5.0** (macOS):
 
 | Test | Checks |
 |---|---|
@@ -30,6 +30,8 @@
 | `triangle_budget_is_used` | the result lands within 3 % below the requested triangle count |
 | `api_normal_strength_sticks` | `bake(normal_strength=…)` survives the settings restore; default 1.0 |
 | `normal_map_repair_flattens_misses` | sideways / backward tangent normals are flattened, valid ones kept |
+| `ambient_occlusion_map_is_baked_and_exported` | AO map is plausible, exported as PNG, in the ORM red channel and as glTF occlusion; temporary world removed |
+| `bake_without_ambient_occlusion` | `ao=False` bakes the other maps and reports them as complete |
 | `translations_complete` | every UI string has ru / es / de / zh translations with matching placeholders |
 
 A live check with Blender's interface language switched to `ru_RU`, `es`, `de_DE` and `zh_HANS` shows the translated strings.
@@ -53,7 +55,7 @@ Test models: a stylised Hunyuan character (49,988 triangles, faceted) and a meta
 | Sculpt, 3k | 2,713 → 2,999 | 0.051 → 0.047 | 6.7 → 6.3 | — | 21.1 → 0.8 | 29.4 → 1.2 |
 | Sculpt, 10k | 8,952 → 10,000 | 0.022 → 0.019 | 5.2 → 4.7 | — | 21.1 → 0.4 | 29.5 → 0.7 |
 
-Values: 1.4.1 → 1.5.0. Tried and **not** kept because they did not measurably help: average-island-scale and concave UV packing (lower utilisation, 3–4× slower bake), 8 bake samples, half / double automatic ray distance, automatic symmetric decimation, disabling the pre-collapse planar dissolve.
+Values: 1.4.1 → 1.5.0. AO (1K, character): full resolution with 8 samples differs from a 64-sample reference by 0.020 on average (p95 0.067); 16 samples 0.012; half resolution + upscale 0.053 (p95 0.30, at UV borders). Removing the planar-dissolve options changed none of the numbers (also checked on a 29,672-triangle building model). Tried and **not** kept because they did not measurably help: average-island-scale and concave UV packing (lower utilisation, 3–4× slower bake), 8 bake samples, half / double automatic ray distance, automatic symmetric decimation, disabling the pre-collapse planar dissolve.
 
 ## Blender MCP run (user's Blender 5.1.2, live scene)
 

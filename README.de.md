@@ -17,7 +17,7 @@
 
 **−94 % Dreiecke · gleiches Aussehen · PBR-Texturen in Sekunden gebacken**
 
-[**⬇ Download**](https://github.com/keeraa/bakedown/releases/latest) · [▶ 40-Sekunden-Demo](docs/media/bakedown_demo.mp4) · [🤖 Für KI-Agenten](AGENTS.md) · [❓ FAQ](docs/FAQ.md)
+[**⬇ Download**](https://github.com/keeraa/bakedown/releases/latest) · [🤖 Für KI-Agenten](AGENTS.md) · [❓ FAQ](docs/FAQ.md)
 
 </div>
 
@@ -40,12 +40,12 @@ Charaktere: **Vereinfachen → Backen → Rig → LOD → Exportieren** (LODs na
 | Original behalten, alles rückgängig machen | duplizieren und selbst verwalten | ✅ automatische Sicherung, **Zurücksetzen** mit einem Klick |
 | Ergebnis festlegen | Decimate-Ratio raten | ✅ Ziel in Dreiecken **oder** als erlaubter Formfehler, in mm und % |
 | KI-Meshes und Scans bereinigen | Verschweißen, lose Teile, Normalen, Split Normals von Hand | ✅ in **Vereinfachen** eingebaut |
-| Aussehen erhalten | 4 Selected-to-Active-Bakes, UVs und Materialien einrichten | ✅ Base Color, Roughness, Metallic, Normal mit einem Klick, Rollback bei Abbruch |
+| Aussehen erhalten | 5 Selected-to-Active-Bakes, UVs und Materialien einrichten | ✅ Base Color, Roughness, Metallic, Normal, AO mit einem Klick, Rollback bei Abbruch |
 | LODs | duplizieren, reduzieren, neu riggen, umbenennen | ✅ LOD0–LOD3-Presets, gemeinsame Texturen, Skelett-bewusst, Warnung bei veralteten LODs |
 | Engine-Export | Achsen, Skalierung, Glättung, Normal-Map-Format merken | ✅ Presets für Unity / Unreal / glTF |
 | Automatisierung | `bpy`-Skripte schreiben und debuggen | ✅ Python-API und Kommandozeile mit JSON-Bericht |
 
-Ein Charakter mit 50.000 Dreiecken wird in **etwa 5 Sekunden** zu 3.000 Dreiecken mit 2K-PBR-Bake, vier LODs und einem Unity-FBX.
+Ein Charakter mit 50.000 Dreiecken wird in **etwa 7 Sekunden** zu 3.000 Dreiecken mit 2K-PBR-Bake, vier LODs und einem Unity-FBX.
 
 Qualität wird gemessen, nicht geschätzt: [`tools/quality_eval.py`](tools/quality_eval.py) rendert Original und Ergebnis von vier Seiten und vergleicht Form, Farbe und Silhouette. Version 1.5 senkte den Fehler im vollständigen Render um das 3- bis 4-Fache bei einem stilisierten Charakter und um das 10- bis 40-Fache bei einer metallischen Skulptur – Details in [docs/VERIFICATION.md](docs/VERIFICATION.md).
 
@@ -60,11 +60,11 @@ Original (links) und BakeDown (rechts): 49.988 → 3.000 Dreiecke, ca. 1,8 mm Ve
 
 ## Was drin ist
 
-- **Vereinfachen** — Ziel in echten Dreiecken oder als Verzerrungsbudget, Bereinigung von KI-Meshes und Scans, Limited Dissolve, Collapse; optional Löcher füllen, Innenflächen entfernen, begradigen, triangulieren. Nur das aktive Mesh wird verändert.
-- **Backen** — Cycles-Baking von Base Color, Roughness, Metallic und Tangent-Normal auf ein neues UV-Layout in 1K/2K/4K; automatische Strahldistanz, Live-Normal-Stärke, Schärfen; Fortschritt, Abbruch mit Esc, vollständiger Rollback.
+- **Vereinfachen** — Ziel in echten Dreiecken oder als Verzerrungsbudget, Bereinigung von KI-Meshes und Scans, Edge-Collapse, automatische Schattierung passend zum Original; optional Löcher füllen, Innenflächen entfernen, begradigen, triangulieren. Nur das aktive Mesh wird verändert.
+- **Backen** — Cycles-Baking von Base Color, Roughness, Metallic, Tangent-Normal und Ambient Occlusion auf ein neues UV-Layout in 1K/2K/4K; automatische Strahldistanz, Live-Normal-Stärke, Schärfen; Fortschritt, Abbruch mit Esc, vollständiger Rollback.
 - **LOD** — LOD0–LOD3 mit den Presets Strategie / 3D-Shooter / Mobil / Eigene, ein gemeinsamer Textursatz, Skelett-bewusst, Benennung `_LOD0…3` für Unity-LOD-Groups.
 - **Rig-Übertragung** — geskinnte FBX-Vorlage importieren und Skelett samt Gewichten auf das aktive Mesh übertragen.
-- **Export** — FBX für Unity, FBX für Unreal, eigenständiges GLB; PNG-Maps neben dem Modell, ORM-Packing, DirectX-Normalen für Unreal.
+- **Export** — FBX für Unity, FBX für Unreal, eigenständiges GLB; PNG-Maps neben dem Modell, ORM-Packing mit echtem AO, glTF-Occlusion, DirectX-Normalen für Unreal.
 - **Prüfen** — Form-Modus (MatCap + Drahtgitter) und Vergleichen Original ↔ Ergebnis.
 
 ## Nutzung mit KI-Agenten
