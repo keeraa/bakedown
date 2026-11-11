@@ -47,6 +47,10 @@ Unreal uses DirectX normal maps: enable **Flip normal-map green channel** when e
 
 **Bake ambient occlusion** (on by default) bakes contact shadows from the original into `<name>_AO.png`. Engines use it to darken creases and covered areas: it goes into the R channel of the ORM texture (Unreal / Unity HDRP style) and into the glTF occlusion slot. It adds about 2 seconds at 2K; switch it off in **2 — Texture → Settings** if you do not need it.
 
+## Glowing parts and transparency
+
+Detected automatically from the original's materials. Glowing parts are baked into `<name>_Emission.png` (with the original emission strength); transparency goes into the alpha channel of `<name>_BaseColor.png`. Mostly cut-out alpha (leaves, hair cards, cloth with holes) becomes alpha clip / glTF *Mask*; soft alpha (glass) becomes alpha blend. In Unity, set the material's Surface Type to *Transparent* or enable *Alpha Clipping*; in Unreal, connect BaseColor alpha to Opacity / Opacity Mask. Only Principled BSDF materials are read.
+
 ## Do LODs share the textures?
 
 Yes — LOD0–LOD3 use the same baked texture set and UVs. Objects are named `<name>_LOD0…3`, so Unity builds a LOD Group automatically. If you simplify or bake again after generating LODs, BakeDown marks them as out of date and refuses to export them until you regenerate.

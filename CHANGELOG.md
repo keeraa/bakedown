@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.6.0 — 2026-11-11
+
+### Added
+
+- **Emission map.** When the original has glowing parts (Principled *Emission Strength* > 0 with a non-black *Emission Color*, or a texture driving them), Bake also produces `<name>_Emission.png`. The colour is normalised to the strongest material so the 8-bit map does not clip; that strength is set on the baked material and exported (glTF `emissiveTexture` + `KHR_materials_emissive_strength`, FBX emissive).
+- **Transparency.** When the original uses Alpha (a texture or a value below 1), the alpha is baked into the alpha channel of `<name>_BaseColor.png` (Unity albedo alpha, glTF baseColor alpha). Mostly 0/1 alpha — leaves, hair cards, cloth with holes — becomes a cutout (glTF `MASK`); soft alpha — glass, fabric — becomes `BLEND`. In Blender the baked material keeps the original's render method (*Dithered* unless the original used *Blended*).
+- Both maps are automatic: nothing to switch on, and nothing extra is baked for opaque, non-glowing models. Wired-but-inert inputs (an opaque alpha texture, a black emission) are detected after baking and dropped.
+- API `report()` has `emission` (bool) and `alpha` (`"CLIP"`, `"BLEND"` or `null`); `images` may contain `Emission`.
+
 ## 1.5.0 — 2026-11-10
 
 Quality release. Every change was measured with the new `tools/quality_eval.py` (four-view renders of original vs result: shape, colour, full material, close-ups, silhouette, surface distance); changes that did not measurably help were not kept.

@@ -61,7 +61,7 @@ Original (links) und BakeDown (rechts): 49.988 → 3.000 Dreiecke, ca. 1,8 mm Ve
 ## Was drin ist
 
 - **Vereinfachen** — Ziel in echten Dreiecken oder als Verzerrungsbudget, Bereinigung von KI-Meshes und Scans, Edge-Collapse, automatische Schattierung passend zum Original; optional Löcher füllen, Innenflächen entfernen, begradigen, triangulieren. Nur das aktive Mesh wird verändert.
-- **Backen** — Cycles-Baking von Base Color, Roughness, Metallic, Tangent-Normal und Ambient Occlusion auf ein neues UV-Layout in 1K/2K/4K; automatische Strahldistanz, Live-Normal-Stärke, Schärfen; Fortschritt, Abbruch mit Esc, vollständiger Rollback.
+- **Backen** — Cycles-Baking von Base Color, Roughness, Metallic, Tangent-Normal, Ambient Occlusion, Emission und Transparenz auf ein neues UV-Layout in 1K/2K/4K; automatische Strahldistanz, Live-Normal-Stärke, Schärfen; Fortschritt, Abbruch mit Esc, vollständiger Rollback.
 - **LOD** — LOD0–LOD3 mit den Presets Strategie / 3D-Shooter / Mobil / Eigene, ein gemeinsamer Textursatz, Skelett-bewusst, Benennung `_LOD0…3` für Unity-LOD-Groups.
 - **Rig-Übertragung** — geskinnte FBX-Vorlage importieren und Skelett samt Gewichten auf das aktive Mesh übertragen.
 - **Export** — FBX für Unity, FBX für Unreal, eigenständiges GLB; PNG-Maps neben dem Modell, ORM-Packing mit echtem AO, glTF-Occlusion, DirectX-Normalen für Unreal.

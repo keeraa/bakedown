@@ -462,6 +462,92 @@ def bake_without_ambient_occlusion():
     assert C.scene.bakedown.bake_ao is True                        # scene default restored
 
 
+def _principled_material(name):
+    m = bpy.data.materials.new(name)
+    m.use_nodes = True
+    return m, m.node_tree.nodes["Principled BSDF"]
+
+
+def _glb_json(path):
+    import json, struct
+    data = open(path, "rb").read()
+    return json.loads(data[20:20 + struct.unpack("<I", data[12:16])[0]])
+
+
+@test
+def emission_and_cutout_alpha_are_baked():
+    import numpy as np
+    fresh()
+    o = sphere("Glow", 4)
+    m, p = _principled_material("GlowMat")
+    nt = m.node_tree
+    chk = nt.nodes.new("ShaderNodeTexChecker")
+    chk.inputs["Scale"].default_value = 3.0
+    nt.links.new(chk.outputs["Fac"], p.inputs["Alpha"])          # 0/1 holes → cutout
+    p.inputs["Emission Color"].default_value = (1.0, 0.2, 0.0, 1.0)
+    p.inputs["Emission Strength"].default_value = 4.0
+    o.data.materials.append(m)
+    bd.simplify(o, triangles=600)
+    r = bd.bake(o, resolution=1024)
+    assert r["baked"] and r["emission"] and r["alpha"] == "CLIP", r
+    em = bpy.data.images[r["images"]["Emission"]]
+    px = np.empty(len(em.pixels), np.float32); em.pixels.foreach_get(px)
+    rgb = px.reshape(-1, 4)[:, :3]
+    used = rgb[rgb[:, 0] > 0.05]
+    assert abs(used[:, 0].mean() - 1.0) < 0.05 and used[:, 2].mean() < 0.05, used.mean(0)
+    base = bpy.data.images[r["images"]["BaseColor"]]
+    bp = np.empty(len(base.pixels), np.float32); base.pixels.foreach_get(bp)
+    a = bp[3::4]
+    assert (a < 0.05).mean() > 0.2 and (a > 0.95).mean() > 0.2, (a < 0.05).mean()
+    mat = bpy.data.materials[r["material"]]
+    bsdf = next(n for n in mat.node_tree.nodes if n.type == 'BSDF_PRINCIPLED')
+    assert bsdf.inputs["Emission Strength"].default_value == 4.0
+    assert bsdf.inputs["Alpha"].is_linked and bsdf.inputs["Emission Color"].is_linked
+    out = bd.export(o, os.path.join(OUT, "glow_gltf"), engine="GLTF")
+    js = _glb_json(next(f for f in out["files"] if f.endswith(".glb")))
+    gm = js["materials"][0]
+    assert gm.get("alphaMode") == "MASK", gm
+    assert "emissiveTexture" in gm, gm
+    out = bd.export(o, os.path.join(OUT, "glow_unity"), engine="UNITY")
+    names = [os.path.basename(f) for f in out["files"]]
+    assert "Glow_Emission.png" in names, names
+    saved = bpy.data.images.load(os.path.join(out["export_dir"], "Glow_BaseColor.png"))
+    assert saved.channels == 4 and saved.depth == 32, (saved.channels, saved.depth)
+
+
+@test
+def semi_transparent_alpha_blends():
+    fresh()
+    o = sphere("Glass", 3)
+    m, p = _principled_material("GlassMat")
+    p.inputs["Alpha"].default_value = 0.4
+    o.data.materials.append(m)
+    bd.simplify(o, triangles=300)
+    r = bd.bake(o, resolution=1024)
+    assert r["alpha"] == "BLEND" and not r["emission"], r
+    out = bd.export(o, os.path.join(OUT, "glass_gltf"), engine="GLTF")
+    js = _glb_json(next(f for f in out["files"] if f.endswith(".glb")))
+    assert js["materials"][0].get("alphaMode") == "BLEND", js["materials"][0]
+
+
+@test
+def opaque_material_gets_no_extra_maps():
+    fresh()
+    o = sphere("Plain", 3)
+    m, p = _principled_material("PlainMat")
+    # wired but inert: opaque alpha texture, emission colour without strength
+    val = m.node_tree.nodes.new("ShaderNodeValue")
+    val.outputs[0].default_value = 1.0
+    m.node_tree.links.new(val.outputs[0], p.inputs["Alpha"])
+    p.inputs["Emission Color"].default_value = (1, 1, 1, 1)
+    p.inputs["Emission Strength"].default_value = 0.0
+    o.data.materials.append(m)
+    bd.simplify(o, triangles=300)
+    r = bd.bake(o, resolution=1024)
+    assert r["baked"] and r["alpha"] is None and not r["emission"], r
+    assert "Emission" not in r["images"]
+
+
 @test
 def api_errors_are_readable():
     fresh()

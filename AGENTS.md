@@ -46,7 +46,7 @@ report = bakedown.process(
 
 Step by step: `bakedown.simplify(obj, triangles=… | distortion=…, **options)`, `bakedown.bake(obj, resolution=2048, normal_map=True, normal_strength=1.0, sharpen=0.0, ray_distance=0.0, ao=True)`, `bakedown.generate_lods(obj, 50, 25, 10)`, `bakedown.export(obj, directory, engine="UNITY")`, `bakedown.report(obj)`.
 
-`ao=True` also bakes ambient occlusion (`images["AO"]`, ORM red channel, glTF occlusion).
+`ao=True` also bakes ambient occlusion (`images["AO"]`, ORM red channel, glTF occlusion). Emission (`images["Emission"]`) and transparency (alpha channel of `BaseColor`) are baked automatically when the original material uses them.
 
 Simplify options: `fill_holes`, `remove_interior`, `planar_snap`, `triangulate_output`.
 
@@ -54,7 +54,7 @@ Every function processes **one** mesh object, never modifies other objects, retu
 
 ## Report fields
 
-`triangles`, `original_triangles`, `distortion_mm`, `distortion_pct`, `baked`, `material`, `images`, `lods[]` (`name`, `level`, `triangles`, `distortion_pct`), `lod_state` (`OK` / `STALE` / `UNKNOWN`), and after export `export_dir`, `files`.
+`triangles`, `original_triangles`, `distortion_mm`, `distortion_pct`, `baked`, `material`, `images`, `emission` (bool), `alpha` (`CLIP` cutout / `BLEND` / `null`), `lods[]` (`name`, `level`, `triangles`, `distortion_pct`), `lod_state` (`OK` / `STALE` / `UNKNOWN`), and after export `export_dir`, `files`.
 
 ## Choosing values
 

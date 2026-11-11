@@ -3,7 +3,7 @@
 bl_info = {
     "name": "BakeDown — Game Asset Optimizer",
     "author": "Kirill Migachev",
-    "version": (1, 5, 0),
+    "version": (1, 6, 0),
     "blender": (4, 5, 0),
     "location": "View3D > Sidebar > BakeDown",
     "description": ("Turn heavy meshes — AI-generated, scanned, sculpted or downloaded — into "
@@ -698,6 +698,18 @@ _NEW_1_3 = {
         "de_DE": "Umgebungsverdeckung",
         "zh_HANS": "环境光遮蔽",
     },
+    "Transparency": {
+        "ru_RU": "Прозрачность",
+        "es": "Transparencia",
+        "de_DE": "Transparenz",
+        "zh_HANS": "透明度",
+    },
+    "Emission": {
+        "ru_RU": "Свечение",
+        "es": "Emisión",
+        "de_DE": "Emission",
+        "zh_HANS": "自发光",
+    },
     "Weight smoothing failed: {}": {
         "ru_RU": "Сглаживание весов не удалось: {}",
         "es": "Error al suavizar los pesos: {}",
@@ -1279,6 +1291,9 @@ def _update_lod_custom(self, context):
     _lod_syncing = False
 
 
+_IMAGE_SUFFIXES = ("BaseColor", "Rough", "Metal", "Normal", "AO", "Emission")
+
+
 def _bake_sig(o, pg):
     """Bake inputs that actually require new pixels. Normal strength is live-only."""
     return "v15|" + "|".join([
@@ -1310,6 +1325,8 @@ def _bake_assets_exist(o, pg):
         required.append("Normal")
     if pg.bake_ao:
         required.append("AO")
+    if o.get("bakedown_baked_emission"):
+        required.append("Emission")
     return all(_baked_image(o, suffix) is not None for suffix in required)
 
 
@@ -1334,7 +1351,8 @@ def _baked_assets_complete(o):
     if not material_name or bpy.data.materials.get(material_name) is None:
         return False
     required = ["BaseColor", "Rough", "Metal"] + (["Normal"] if flags["normal"] else []) \
-        + (["AO"] if flags["ao"] else [])
+        + (["AO"] if flags["ao"] else []) \
+        + (["Emission"] if o.get("bakedown_baked_emission") else [])
     return all(_baked_image(o, suffix) is not None for suffix in required)
 
 
@@ -1948,15 +1966,22 @@ def _principled(mat):
     return next((n for n in mat.node_tree.nodes if n.type == 'BSDF_PRINCIPLED'), None)
 
 
-def _emit_copy(orig, socket_name):
+def _emit_copy(orig, socket_name, fallback=None):
     """Material copy with one Principled input routed into Emission, for an EMIT bake
-    that reads the input exactly (no lighting, no metallic darkening)."""
+    that reads the input exactly (no lighting, no metallic darkening). Materials
+    without a Principled node emit `fallback` (when given)."""
     mc = orig.copy()
     nt = mc.node_tree
     p = _principled(mc)
     out = next((n for n in nt.nodes if n.type == 'OUTPUT_MATERIAL' and n.is_active_output), None) \
         or next((n for n in nt.nodes if n.type == 'OUTPUT_MATERIAL'), None)
-    if p is None or out is None:
+    if out is None:
+        return mc
+    if p is None:
+        if fallback is not None:
+            em = nt.nodes.new("ShaderNodeEmission")
+            em.inputs['Color'].default_value = (fallback, fallback, fallback, 1.0)
+            nt.links.new(em.outputs['Emission'], out.inputs['Surface'])
         return mc
     em = nt.nodes.new("ShaderNodeEmission")
     em.inputs['Strength'].default_value = 1.0
@@ -1973,6 +1998,84 @@ def _emit_copy(orig, socket_name):
 def _metallic_emit_copy(orig):
     """Material copy with Metallic routed into Emission (for the EMIT metallic bake)."""
     return _emit_copy(orig, 'Metallic')
+
+
+def _socket_active(sock, idle):
+    """True when a Principled input is linked or differs from its 'no effect' value."""
+    if sock is None:
+        return False
+    if sock.is_linked:
+        return True
+    v = sock.default_value
+    vals = list(v)[:3] if hasattr(v, "__len__") else [v]
+    return any(abs(float(x) - idle) > 1e-3 for x in vals)
+
+
+def _emission_strength(p):
+    """Emission strength of a Principled node (1.0 when it is driven by a texture)."""
+    s = p.inputs.get('Emission Strength')
+    if s is None:
+        return 0.0
+    return 1.0 if s.is_linked else max(0.0, float(s.default_value))
+
+
+def _material_extras(materials):
+    """(max emission strength, uses alpha) of the original Principled materials.
+    Non-Principled materials are ignored: their look is baked through the DIFFUSE pass."""
+    strength, alpha = 0.0, False
+    for m in materials:
+        p = _principled(m)
+        if p is None:
+            continue
+        col = p.inputs.get('Emission Color') or p.inputs.get('Emission')
+        s = _emission_strength(p)
+        if s > 0.0 and _socket_active(col, 0.0):
+            strength = max(strength, s)
+        if _socket_active(p.inputs.get('Alpha'), 1.0):
+            alpha = True
+    return strength, alpha
+
+
+def _emission_emit_copy(orig, scale):
+    """Material copy that emits Emission Color × Strength × scale (scale keeps the
+    strongest material at 1.0 so the 8-bit map does not clip)."""
+    mc = orig.copy()
+    nt = mc.node_tree
+    p = _principled(mc)
+    out = next((n for n in nt.nodes if n.type == 'OUTPUT_MATERIAL' and n.is_active_output), None) \
+        or next((n for n in nt.nodes if n.type == 'OUTPUT_MATERIAL'), None)
+    if out is None:
+        return mc
+    em = nt.nodes.new("ShaderNodeEmission")
+    em.inputs['Color'].default_value = (0, 0, 0, 1)
+    em.inputs['Strength'].default_value = 0.0
+    if p is not None:
+        col = p.inputs.get('Emission Color') or p.inputs.get('Emission')
+        strength = p.inputs.get('Emission Strength')
+        if col is not None and col.is_linked:
+            nt.links.new(col.links[0].from_socket, em.inputs['Color'])
+        elif col is not None:
+            em.inputs['Color'].default_value = tuple(col.default_value)
+        if strength is not None and strength.is_linked:
+            mul = nt.nodes.new("ShaderNodeMath")
+            mul.operation = 'MULTIPLY'
+            mul.inputs[1].default_value = scale
+            nt.links.new(strength.links[0].from_socket, mul.inputs[0])
+            nt.links.new(mul.outputs[0], em.inputs['Strength'])
+        elif strength is not None:
+            em.inputs['Strength'].default_value = float(strength.default_value) * scale
+    nt.links.new(em.outputs['Emission'], out.inputs['Surface'])
+    return mc
+
+
+def _image_channel(im, channel):
+    import numpy as np
+    px = np.empty(im.size[0] * im.size[1] * 4, dtype=np.float32)
+    im.pixels.foreach_get(px)
+    return px[channel::4].copy()
+
+
+_ALPHA_CLIP_SHARE = 0.03   # ≤ 3 % semi-transparent texels → cutout (glTF MASK)
 
 
 # UV layout for the bake (tuned with tools/quality_eval.py)
@@ -2168,7 +2271,7 @@ class OBJECT_OT_bakedown_bake(bpy.types.Operator):
         self._previous_material_name = lo.get("bakedown_material_name")
         self._previous_image_names = {
             suffix: lo.get(f"bakedown_image_{suffix}")
-            for suffix in ("BaseColor", "Rough", "Metal", "Normal", "AO")
+            for suffix in _IMAGE_SUFFIXES
         }
         self._nstr = pg.bake_normal_strength
         self._committed = False
@@ -2195,22 +2298,39 @@ class OBJECT_OT_bakedown_bake(bpy.types.Operator):
 
             token = uuid.uuid4().hex[:8]
 
-            def _img(suffix, non_color):
+            # Emission and transparency are baked only when the original uses them.
+            hi_mats = [s.material for s in lo.material_slots] or list(bm.materials)
+            self._emit_strength, self._uses_alpha = _material_extras(hi_mats)
+            # Keep the original's viewport transparency method (Blender default: Dithered).
+            self._render_method = 'BLENDED' if any(
+                getattr(m, "surface_render_method", None) == 'BLENDED'
+                for m in hi_mats if m is not None) else 'DITHERED'
+            self._scratch_images = []
+
+            def _img(suffix, non_color, alpha=False):
                 im = bpy.data.images.new(
                     f"__BakeDownTemp_{token}_{suffix}", res, res,
-                    alpha=False, float_buffer=False)
+                    alpha=alpha, float_buffer=False)
                 im.colorspace_settings.name = 'Non-Color' if non_color else 'sRGB'
                 self._temp_images.append(im)
                 self._image_targets[im.name] = f"{lo.name}_{suffix}"
                 return im
 
-            self.img_base = _img("BaseColor", False)
+            self.img_base = _img("BaseColor", False, alpha=self._uses_alpha)
             self.img_rough = _img("Rough", True)
             self.img_metal = _img("Metal", True)
             self.img_norm = _img("Normal", True) if pg.bake_normal else None
             # Full resolution: half-res AO + upscale was measured 2.6x less accurate
             # (UV island borders bleed into the background).
             self.img_ao = _img("AO", True) if pg.bake_ao else None
+            self.img_emit = _img("Emission", False) if self._emit_strength > 0.0 else None
+            self.img_alpha = None
+            if self._uses_alpha:
+                self.img_alpha = bpy.data.images.new(
+                    f"__BakeDownTemp_{token}_Alpha", res, res, alpha=False, float_buffer=False)
+                self.img_alpha.colorspace_settings.name = 'Non-Color'
+                self._scratch_images.append(self.img_alpha)
+            self._alpha_clip = False
 
             self.hi = bpy.data.objects.new(f"__bakedown_hipoly_{token}", bm)
             context.scene.collection.objects.link(self.hi)
@@ -2244,6 +2364,14 @@ class OBJECT_OT_bakedown_bake(bpy.types.Operator):
                 self.n_ao = nt.nodes.new("ShaderNodeTexImage"); self.n_ao.location = (-450, -850)
                 self.n_ao.image = self.img_ao
                 self.n_ao.interpolation = 'Linear'
+            self.n_emit = None
+            if self.img_emit is not None:
+                self.n_emit = nt.nodes.new("ShaderNodeTexImage"); self.n_emit.location = (-450, -1150)
+                self.n_emit.image = self.img_emit
+            self.n_alpha = None
+            if self.img_alpha is not None:
+                self.n_alpha = nt.nodes.new("ShaderNodeTexImage"); self.n_alpha.location = (-450, -1450)
+                self.n_alpha.image = self.img_alpha
             self._slot_state = [(s.link, s.material) for s in lo.material_slots]
             lo.data.materials.clear()
             lo.data.materials.append(self.mat)
@@ -2277,12 +2405,17 @@ class OBJECT_OT_bakedown_bake(bpy.types.Operator):
 
             self._passes = [(_tr("Base Color"), self._p_diffuse),
                             (_tr("Roughness"), self._p_rough)]
+            if self.n_alpha is not None:
+                self._passes.append((_tr("Transparency"), self._p_alpha))
+            if self.n_emit is not None:
+                self._passes.append((_tr("Emission"), self._p_emit))
             if self.n_norm is not None:
                 self._passes.append((_tr("Normals"), self._p_normal))
             if self.n_ao is not None:
                 self._passes.append((_tr("Ambient occlusion"), self._p_ao))
             self._passes.append((_tr("Metallic"), self._p_metal))
-            for im in (self.img_base, self.img_rough, self.img_metal, self.img_norm, self.img_ao):
+            for im in (self.img_base, self.img_rough, self.img_metal, self.img_norm, self.img_ao,
+                       self.img_emit):
                 if im is not None:
                     self._passes.append((_tr("Packing"),
                                          (lambda image: (lambda _ctx: self._p_pack(image)))(im)))
@@ -2350,7 +2483,7 @@ class OBJECT_OT_bakedown_bake(bpy.types.Operator):
         if 'FINISHED' not in result:
             raise RuntimeError(f"Blender bake operator returned {result}")
 
-    def _bake_emit_socket(self, context, node, socket_name):
+    def _bake_emit_socket(self, context, node, socket_name, fallback=None):
         """Bake one Principled input through an emission reroute on material copies,
         then put the original materials back for the following passes."""
         saved = [(slot.link, slot.material) for slot in self.hi.material_slots]
@@ -2358,7 +2491,7 @@ class OBJECT_OT_bakedown_bake(bpy.types.Operator):
             for slot in self.hi.material_slots:
                 if slot.material is None:
                     continue
-                mc = _emit_copy(slot.material, socket_name)
+                mc = _emit_copy(slot.material, socket_name, fallback)
                 self.copies.append(mc)
                 slot.link = 'OBJECT'
                 slot.material = mc
@@ -2400,11 +2533,75 @@ class OBJECT_OT_bakedown_bake(bpy.types.Operator):
             cycles.samples = old
         _blur_image(self.img_ao, passes=1)              # remove sampling noise
 
+    def _p_alpha(self, context):
+        """Bake the original alpha and store it in the Base Color alpha channel
+        (Unity albedo alpha, glTF baseColor alpha)."""
+        import numpy as np
+        # Pre-fill with a sentinel (R=0, G=1) that a grey emission bake never writes,
+        # so texels outside the UV islands can be told apart from transparent ones.
+        n = self.img_alpha.size[0] * self.img_alpha.size[1]
+        self.img_alpha.pixels.foreach_set(np.tile(np.array([0, 1, 0, 1], np.float32), n))
+        bake = context.scene.render.bake
+        old_clear = bake.use_clear
+        bake.use_clear = False
+        try:
+            self._bake_emit_socket(context, self.n_alpha, 'Alpha', fallback=1.0)
+        finally:
+            bake.use_clear = old_clear
+        r = _image_channel(self.img_alpha, 0)
+        g = _image_channel(self.img_alpha, 1)
+        baked = np.abs(r - g) < 0.02
+        a = np.where(baked, np.clip(r, 0.0, 1.0), 0.0).astype(np.float32)
+        if not baked.any() or a[baked].min() > 0.995:
+            self._uses_alpha = False       # alpha socket was wired but fully opaque
+        else:
+            w, h = self.img_base.size
+            px = np.empty(w * h * 4, dtype=np.float32)
+            self.img_base.pixels.foreach_get(px)
+            px[3::4] = a
+            self.img_base.pixels.foreach_set(px)
+            self.img_base.update()
+            covered = a[baked]
+            semi = ((covered > 0.1) & (covered < 0.9)).mean()
+            self._alpha_clip = bool(semi <= _ALPHA_CLIP_SHARE)
+        self.n_alpha.image = None
+        self.nt.nodes.remove(self.n_alpha)
+        self.n_alpha = None
+
+    def _p_emit(self, context):
+        saved = [(slot.link, slot.material) for slot in self.hi.material_slots]
+        scale = 1.0 / self._emit_strength
+        try:
+            for slot in self.hi.material_slots:
+                if slot.material is None:
+                    continue
+                mc = _emission_emit_copy(slot.material, scale)
+                self.copies.append(mc)
+                slot.link = 'OBJECT'
+                slot.material = mc
+            self._do_bake(context, self.n_emit, 'EMIT')
+        finally:
+            for slot, (link, mat) in zip(self.hi.material_slots, saved):
+                slot.link = link
+                if link == 'OBJECT':
+                    slot.material = mat
+        import numpy as np
+        if float(np.max(_image_channel(self.img_emit, 0))) <= 0.002 and \
+                float(np.max(_image_channel(self.img_emit, 1))) <= 0.002 and \
+                float(np.max(_image_channel(self.img_emit, 2))) <= 0.002:
+            # Emission was wired but black everywhere: drop the map.
+            self._temp_images.remove(self.img_emit)
+            self._scratch_images.append(self.img_emit)
+            self.nt.nodes.remove(self.n_emit)
+            self.n_emit = None
+            self.img_emit = None
+
     def _p_metal(self, context):
         self._bake_emit_socket(context, self.n_met, 'Metallic')
 
     def _p_pack(self, im):
-        im.pack()
+        if _alive(im) is not None and im in self._temp_images:
+            im.pack()
 
     def modal(self, context, event):
         pg = context.scene.bakedown
@@ -2468,10 +2665,29 @@ class OBJECT_OT_bakedown_bake(bpy.types.Operator):
             sep.location = (100, -850)
             nt.links.new(self.n_ao.outputs['Color'], sep.inputs['Color'])
             nt.links.new(sep.outputs['Red'], group.inputs['Occlusion'])
+        if self.n_emit is not None:
+            nt.links.new(self.n_emit.outputs['Color'], self.bsdf.inputs['Emission Color'])
+            self.bsdf.inputs['Emission Strength'].default_value = self._emit_strength
+        if self._uses_alpha:
+            if self._alpha_clip:
+                # Round → glTF MASK (cutout): leaves, hair cards, cloth with holes
+                rnd = nt.nodes.new("ShaderNodeMath")
+                rnd.operation = 'ROUND'
+                rnd.location = (100, 150)
+                nt.links.new(self.n_base.outputs['Alpha'], rnd.inputs[0])
+                nt.links.new(rnd.outputs[0], self.bsdf.inputs['Alpha'])
+            else:
+                nt.links.new(self.n_base.outputs['Alpha'], self.bsdf.inputs['Alpha'])
+            try:
+                self.mat.surface_render_method = 'DITHERED' if self._alpha_clip else self._render_method
+            except Exception:
+                pass
         nt.nodes.active = self.n_base      # Solid > Texture view shows the colour map
 
+        produced = set()
         for im in self._temp_images:
             desired = self._image_targets[im.name]
+            produced.add(desired.rsplit('_', 1)[-1])
             existing = bpy.data.images.get(desired)
             if existing is not None and existing != im and existing.users == 0:
                 bpy.data.images.remove(existing)
@@ -2479,6 +2695,12 @@ class OBJECT_OT_bakedown_bake(bpy.types.Operator):
             im.name = final_name
             suffix = desired.rsplit('_', 1)[-1]
             self.lo[f"bakedown_image_{suffix}"] = final_name
+        for suffix in _IMAGE_SUFFIXES:
+            if suffix not in produced and f"bakedown_image_{suffix}" in self.lo:
+                del self.lo[f"bakedown_image_{suffix}"]
+        self.lo["bakedown_baked_emission"] = self.img_emit is not None
+        self.lo["bakedown_baked_alpha"] = ("CLIP" if self._alpha_clip else "BLEND") \
+            if self._uses_alpha else ""
 
         desired_mat = f"{self.lo.name}_Baked"
         existing_mat = bpy.data.materials.get(desired_mat)
@@ -2572,6 +2794,13 @@ class OBJECT_OT_bakedown_bake(bpy.types.Operator):
             except Exception:
                 pass
         self.copies = []
+        for im in getattr(self, '_scratch_images', []):
+            if _alive(im) is not None and im.users == 0:
+                try:
+                    bpy.data.images.remove(im)
+                except Exception:
+                    pass
+        self._scratch_images = []
         if getattr(self, 'hi', None) is not None:
             try:
                 bpy.data.objects.remove(self.hi, do_unlink=True)
@@ -2764,7 +2993,7 @@ class OBJECT_OT_bakedown_export(bpy.types.Operator):
                 self.report({'WARNING'}, _tr("glTF requires OpenGL normal maps; the green channel was not flipped"))
             found_images = []
             if self.save_textures:
-                for suffix in ("BaseColor", "Rough", "Metal", "Normal", "AO"):
+                for suffix in _IMAGE_SUFFIXES:
                     image = _baked_image(base_obj, suffix)
                     if image is None:
                         continue
@@ -3588,7 +3817,7 @@ def report(obj):
     lods = ([ob for ob in coll.objects if ob.get("bakedown_lod_of") == base.name]
             if coll is not None else [])
     images = {}
-    for suffix in ("BaseColor", "Rough", "Metal", "Normal", "AO"):
+    for suffix in _IMAGE_SUFFIXES:
         image = _baked_image(base, suffix)
         if image is not None:
             images[suffix] = image.name
@@ -3605,6 +3834,8 @@ def report(obj):
         "baked": _baked_assets_complete(base),
         "material": base.get("bakedown_material_name"),
         "images": images,
+        "emission": bool(base.get("bakedown_baked_emission")),
+        "alpha": base.get("bakedown_baked_alpha") or None,
         "lods": [{"name": ob.name, "level": ob.get("bakedown_lod_level"),
                   "triangles": _triangle_count_object(ob),
                   "distortion_pct": ob.get("bakedown_distort_pct")}

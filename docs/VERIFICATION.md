@@ -2,7 +2,7 @@
 
 ## Automated (headless Blender)
 
-`tests/run_tests.py` — **27/27 PASS** on Blender **5.1.2** and **4.5.0** (macOS):
+`tests/run_tests.py` — **30/30 PASS** on Blender **5.1.2** and **4.5.0** (macOS):
 
 | Test | Checks |
 |---|---|
@@ -56,6 +56,19 @@ Test models: a stylised Hunyuan character (49,988 triangles, faceted) and a meta
 | Sculpt, 10k | 8,952 → 10,000 | 0.022 → 0.019 | 5.2 → 4.7 | — | 21.1 → 0.4 | 29.5 → 0.7 |
 
 Values: 1.4.1 → 1.5.0. AO (1K, character): full resolution with 8 samples differs from a 64-sample reference by 0.020 on average (p95 0.067); 16 samples 0.012; half resolution + upscale 0.053 (p95 0.30, at UV borders). Removing the planar-dissolve options changed none of the numbers (also checked on a 29,672-triangle building model). Tried and **not** kept because they did not measurably help: average-island-scale and concave UV packing (lower utilisation, 3–4× slower bake), 8 bake samples, half / double automatic ray distance, automatic symmetric decimation, disabling the pre-collapse planar dissolve.
+
+### 1.6.0: emission and transparency
+
+The test character (49,988 → 3,000 triangles, 2K bake) was given four material variants on its real geometry and UVs, and each was evaluated with 1.5.0 and 1.6.0 (EEVEE full-render pixel error, lower is better):
+
+| Variant | 1.5.0 | 1.6.0 |
+|---|---|---|
+| Glow — bright texture areas emit at strength 4 | 105.5 | 3.6 |
+| Cutout — Voronoi holes in UV space (0/1 alpha) | 3.5 | 2.0 |
+| Glass — alpha 0.5 | 11.0 | 2.6 |
+| Glow + cutout | 105.0 | 3.8 |
+
+On the unmodified (opaque) character all five maps baked by 1.5.0 and 1.6.0 are bit-identical, and every quality metric is unchanged. In *albedo* mode the cutout variants read 0.37 → 1.65 because Workbench shows the baked texture's alpha but not the original's node-driven alpha; full renders show the holes match.
 
 ## Blender MCP run (user's Blender 5.1.2, live scene)
 

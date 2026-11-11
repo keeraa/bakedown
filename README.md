@@ -61,7 +61,7 @@ Original (left) vs BakeDown (right): 49,988 → 3,000 triangles, approx. distort
 ## What's inside
 
 - **Simplify** — real-triangle or distortion-budget target, cleanup of AI/scan meshes, edge-collapse decimation, automatic shading that matches the original; optional hole filling, interior-face removal, flattening, triangulation. Only the active mesh is touched.
-- **Bake** — Cycles bake of Base Color, Roughness, Metallic, tangent Normal and ambient occlusion onto a fresh UV layout at 1K/2K/4K; automatic ray distance, live normal strength, sharpening; progress, Esc to cancel, full rollback.
+- **Bake** — Cycles bake of Base Color, Roughness, Metallic, tangent Normal, ambient occlusion, emission and transparency onto a fresh UV layout at 1K/2K/4K; automatic ray distance, live normal strength, sharpening; progress, Esc to cancel, full rollback.
 - **LOD** — LOD0–LOD3 with Strategy / 3D Shooter / Mobile / Custom presets, one shared texture set, armature-aware, `_LOD0…3` naming for Unity LOD Groups.
 - **Rig transfer** — import a skinned FBX template and transfer armature and weights to the active mesh.
 - **Export** — Unity FBX, Unreal FBX, self-contained GLB; PNG maps next to the model, ORM packing with real AO, glTF occlusion, DirectX normal flip for Unreal.

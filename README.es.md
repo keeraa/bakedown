@@ -61,7 +61,7 @@ Original (izquierda) frente a BakeDown (derecha): 49.988 → 3.000 triángulos, 
 ## Qué incluye
 
 - **Simplificar** — objetivo en triángulos reales o en margen de distorsión, limpieza de mallas de IA y escaneos, colapso de aristas, sombreado automático igual al original; opcionalmente relleno de agujeros, eliminación de caras interiores, aplanado y triangulación. Solo se modifica la malla activa.
-- **Hornear** — horneado en Cycles de Base Color, Roughness, Metallic, Normal tangente y oclusión ambiental sobre un nuevo despliegue UV a 1K/2K/4K; distancia de rayo automática, intensidad de normales en vivo, nitidez; progreso, Esc para cancelar, reversión completa.
+- **Hornear** — horneado en Cycles de Base Color, Roughness, Metallic, Normal tangente, oclusión ambiental, emisión y transparencia sobre un nuevo despliegue UV a 1K/2K/4K; distancia de rayo automática, intensidad de normales en vivo, nitidez; progreso, Esc para cancelar, reversión completa.
 - **LOD** — LOD0–LOD3 con preajustes Estrategia / Shooter 3D / Móvil / Personalizado, un único juego de texturas, compatible con esqueletos, nombres `_LOD0…3` para LOD Groups de Unity.
 - **Transferencia de rig** — importa una plantilla FBX con skinning y transfiere esqueleto y pesos a la malla activa.
 - **Exportar** — FBX para Unity, FBX para Unreal, GLB autónomo; mapas PNG junto al modelo, empaquetado ORM con AO real, oclusión glTF, normales en formato DirectX para Unreal.
